@@ -1,0 +1,28 @@
+{
+  "_comment": "Copy this to config.json and fill in your values. config.json is gitignored. Secrets (API keys, RSS keys, cookies) never go here; they live in the secrets_dir. See README bootstrap section.",
+  "identity": {
+    "name": "Your Name",
+    "context": "what you do in one line, used to personalize pre-engagement briefs (e.g. 'early-stage VC focused on AI infra')",
+    "interests": ["your", "topic", "areas", "one-word-each"],
+    "git_emails": ["you@example.com"],
+    "github_login": "your-github-username",
+    "goodreads_user_id": "00000000",
+    "substack_feed": "https://yourhandle.substack.com/feed"
+  },
+  "browser": "brave",
+  "secrets_dir": "~/Developer/helpers",
+  "models": {
+    "process": "claude-sonnet-5"
+  },
+  "podcasts": {
+    "cutoff": "20221128"
+  },
+  "sources": {
+    "x_bookmarks": true,
+    "goodreads": true,
+    "substack": true,
+    "github": true,
+    "podcasts": true,
+    "youtube_likes": true
+  }
+}

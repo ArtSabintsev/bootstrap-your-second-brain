@@ -1,0 +1,142 @@
+# Canonical concept registry. The operator owns this list; agents propose
+# additions, never auto-mint. Topics not here stay as unfiled claims on episode
+# notes until you promote them.
+#
+# This is a small, generic STARTER. Grow it to match your own interests: add a
+# `- slug:` block per canonical concept, give it a `domain`, and list the raw
+# topic phrases that should fold into it as `aliases`. The lint pass
+# (scripts/intelligence/lint.py) flags high-frequency topics that are not yet
+# in this file (drift in) and concepts here with zero appearances (drift out).
+
+concepts:
+  # ---------------------------------------------------------------------
+  # ai
+  # ---------------------------------------------------------------------
+  - slug: ai-agents
+    title: AI Agents
+    domain: ai
+    aliases:
+      - autonomous-agents
+      - agentic-workflows
+      - vertical-ai-agents
+      - tool-use
+
+  - slug: frontier-vs-open-source-ai
+    title: Frontier Labs vs. Open-Source AI
+    domain: ai
+    aliases:
+      - open-source-ai
+      - foundation-models
+      - model-releases
+
+  - slug: agi-timelines-and-scaling-laws
+    title: AGI Timelines & Scaling Laws
+    domain: ai
+    aliases:
+      - agi-timelines
+      - scaling-laws
+      - compute-and-training
+
+  - slug: ai-in-the-enterprise
+    title: AI in the Enterprise
+    domain: ai
+    aliases:
+      - enterprise-ai
+      - ai-adoption
+      - internal-software
+
+  # ---------------------------------------------------------------------
+  # technology & startups
+  # ---------------------------------------------------------------------
+  - slug: startups-and-founders
+    title: Startups & Founders
+    domain: venture
+    aliases:
+      - founder-lessons
+      - product-market-fit
+      - go-to-market
+
+  - slug: venture-capital
+    title: Venture Capital
+    domain: venture
+    aliases:
+      - fundraising
+      - term-sheets
+      - fund-strategy
+
+  - slug: software-engineering
+    title: Software Engineering
+    domain: technology
+    aliases:
+      - developer-tools
+      - ai-coding
+      - system-design
+
+  # ---------------------------------------------------------------------
+  # markets & money
+  # ---------------------------------------------------------------------
+  - slug: macro-and-markets
+    title: Macro & Markets
+    domain: markets
+    aliases:
+      - interest-rates
+      - inflation
+      - recession-risk
+
+  - slug: crypto-and-tokens
+    title: Crypto & Tokens
+    domain: crypto
+    aliases:
+      - tokenomics
+      - stablecoins
+      - onchain
+
+  - slug: bitcoin
+    title: Bitcoin
+    domain: crypto
+    aliases:
+      - btc
+      - proof-of-work
+      - self-custody
+
+  # ---------------------------------------------------------------------
+  # ideas & the world
+  # ---------------------------------------------------------------------
+  - slug: geopolitics
+    title: Geopolitics
+    domain: world
+    aliases:
+      - us-china
+      - foreign-policy
+      - trade
+
+  - slug: philosophy-and-ideas
+    title: Philosophy & Ideas
+    domain: ideas
+    aliases:
+      - ethics
+      - epistemology
+      - meaning
+
+  - slug: science-and-frontier-research
+    title: Science & Frontier Research
+    domain: science
+    aliases:
+      - physics
+      - biology
+      - space
+
+  - slug: history
+    title: History
+    domain: ideas
+    aliases:
+      - economic-history
+      - history-of-technology
+
+  - slug: health-and-longevity
+    title: Health & Longevity
+    domain: science
+    aliases:
+      - nutrition
+      - sleep
+      - fitness
