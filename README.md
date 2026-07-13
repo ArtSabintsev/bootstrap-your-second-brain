@@ -80,22 +80,22 @@ INTERFACE      ask.sh (AI) → answers with [[citations]]
 
 ## Where the AI does the work, and where it does not
 
-The design rule: the LLM does judgment and synthesis; deterministic code does
-plumbing. There is no vector database. Retrieval is agentic grep-and-read, the
-model searches the files selectively, which is cheaper and needs no embedding
-infrastructure.
+The LLM does judgment and synthesis. Deterministic code does the plumbing. There
+is no vector database. Retrieval is agentic grep-and-read: the model searches the
+files selectively, which is cheaper and needs no embedding infrastructure.
 
 Six places call an LLM (all shell out to the `claude` CLI; `ask.sh` also
 supports `grok`). Your identity is injected into each prompt from `config.json`:
 
-1. `scripts/ingest-daily.sh` — the daily pass over new captures: follow links,
-   research, analyze second-order implications, file with frontmatter and links.
-2. `scripts/podcasts/synth_episode.sh` — turn one transcript into a deep note.
-3. `scripts/youtube_likes/synth_like.sh` — judge whether a liked video is
-   substantive, then synthesize a note only if it is.
-4. `scripts/intelligence/build_ledger.sh` — build a person's dated ledger.
-5. `scripts/intelligence/brief.sh` — write a pre-engagement brief.
-6. `scripts/ask.sh` — answer an arbitrary question against the vault, cited.
+1. `scripts/ingest-daily.sh` runs the daily pass over new captures. It follows
+   links, researches context, analyzes second-order implications, and files the
+   substantive items with frontmatter and wikilinks.
+2. `scripts/podcasts/synth_episode.sh` turns one transcript into a deep note.
+3. `scripts/youtube_likes/synth_like.sh` judges whether a liked video is
+   substantive, then synthesizes a note only if it is.
+4. `scripts/intelligence/build_ledger.sh` builds a person's dated position ledger.
+5. `scripts/intelligence/brief.sh` writes a pre-engagement brief.
+6. `scripts/ask.sh` answers an arbitrary question against the vault, with citations.
 
 Everything else is plain code with no AI: the source ingesters, the graph index
 (`build_links.py`), transcript fetching, candidate selection, and the lint pass.
