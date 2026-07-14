@@ -1,8 +1,8 @@
 {
-  "_comment": "Copy this to config.json and fill in your values. config.json is gitignored. Secrets (API keys, RSS keys, cookies) never go here; they live in the secrets_dir. See README bootstrap section.",
+  "_comment": "Copy to config.json (gitignored) and fill in. Secrets never go here; see secrets.example/README.md and SETUP.md. Disable any sources you will not configure.",
   "identity": {
     "name": "Your Name",
-    "context": "what you do in one line, used to personalize pre-engagement briefs (e.g. 'early-stage VC focused on AI infra')",
+    "context": "what you do in one line, used to personalize pre-engagement briefs (e.g. early-stage VC focused on AI infra)",
     "interests": ["your", "topic", "areas", "one-word-each"],
     "git_emails": ["you@example.com"],
     "github_login": "your-github-username",

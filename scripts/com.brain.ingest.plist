@@ -3,9 +3,11 @@
 <!--
   Daily multi-source ingest into the second-brain vault (X bookmarks, Goodreads,
   Substack, GitHub, podcasts, YouTube likes). Read-only against the external
-  accounts.
-  Before installing: edit the ProgramArguments path below to point at wherever
-  you cloned this repo (default assumes ~/Developer/second-brain).
+  accounts except optional X-bookmark cleanup after successful processing.
+
+  scripts/bootstrap.sh rewrites the ProgramArguments path to your clone.
+  Default below assumes ~/Developer/second-brain.
+
   Install:
     cp scripts/com.brain.ingest.plist ~/Library/LaunchAgents/
     launchctl load ~/Library/LaunchAgents/com.brain.ingest.plist

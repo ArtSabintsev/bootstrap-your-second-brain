@@ -5,7 +5,7 @@
 #
 #   ask.sh [-m claude|grok] [-s]  "your question"
 #     -m  model (default: claude)
-#     -s  save the answer to Briefs/ask-<timestamp-from-git>.md instead of stdout
+#     -s  save the answer to Briefs/ask-<n>.md instead of stdout
 #
 # Obsidian wiring (Shell Commands plugin): bind a hotkey to
 #   scripts/ask.sh -m claude "{{selection}}"
@@ -13,8 +13,10 @@
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+# shellcheck source=lib.sh
+source "$ROOT/scripts/lib.sh"
 cd "$ROOT"
-OPERATOR="$("$ROOT/.venv/bin/python3" "$ROOT/scripts/config.py" identity.name 2>/dev/null || echo 'the operator')"
+OPERATOR="$(brain_py "$ROOT/scripts/config.py" identity.name 2>/dev/null || echo 'the operator')"
 MODEL="claude"; SAVE=0
 while getopts "m:s" opt; do
   case $opt in
@@ -28,14 +30,25 @@ Q="$*"
 [[ -z "$Q" ]] && { echo "usage: ask.sh [-m claude|grok] [-s] \"question\"" >&2; exit 1; }
 
 read -r -d '' PROMPT <<EOF || true
-Answer this question against $OPERATOR's second-brain vault (this directory). Search
-the notes and the intelligence layer: Topics/ (canonical concepts), People/
-(position ledgers), Theses/ ($OPERATOR's dated positions + counter-evidence),
-Library/, Briefs/, Drafts/, and _indexes/appearances.json (the people/topics ->
-episodes graph). Prefer what $OPERATOR has actually written and tracked over generic
-knowledge. Cite the notes you used as [[wikilinks]]. Be specific and dense, in
-plain voice, no em-dashes, no filler. If the honest answer is that the vault does
-not cover this, say so rather than padding.
+Answer this question against $OPERATOR's second-brain vault (this directory).
+
+Session bootstrap (do this first for non-trivial questions):
+- Read Profile/00-overview.md and Profile/working-with-me.md if present.
+- Pull other Profile/ notes when the question is about priorities, identity,
+  goals, or how $OPERATOR should decide.
+
+Then search the intelligence layer and notes:
+- Profile/ (who they are; wins over generic knowledge)
+- Theses/ (dated positions + counter-evidence)
+- Topics/ (canonical concepts), People/ (position ledgers)
+- Log/ (recent decisions, lessons, kills)
+- Library/, Briefs/, Drafts/, Projects/, todos.md
+- _indexes/appearances.json (people/topics -> episodes graph)
+
+Prefer what $OPERATOR has actually written and tracked over generic knowledge.
+Cite the notes you used as [[wikilinks]]. Be specific and dense, in plain voice,
+no em-dashes, no filler. If the honest answer is that the vault does not cover
+this, say so rather than padding.
 
 Question: $Q
 EOF

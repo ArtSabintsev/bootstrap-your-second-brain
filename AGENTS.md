@@ -1,21 +1,22 @@
 ---
 title: "Vault contract"
 type: schema
-updated: 2026-07-13
+updated: 2026-07-14
 ---
 
 # AGENTS.md - Vault contract
 
 This repo is a config-driven "second brain": an Obsidian vault plus the
 automation that keeps it fed and useful. It is also the persistent memory the
-operator's agents (Claude Code, Grok CLI) load for context. "The operator" is
-whoever cloned and configured this repo; their identity, handles, and interests
-come from `config.json` (see Bootstrap below), never hardcoded.
+operator's agents (Claude Code, Grok CLI, Codex) load for context. "The
+operator" is whoever cloned and configured this repo; their identity, handles,
+and interests come from `config.json` (see Bootstrap / SETUP.md), never hardcoded.
 
 ## Structure
 
 ```
 README.md    <- Home / Map of Content
+SETUP.md     <- human + AI bootstrap walkthrough
 Profile/     <- who the operator is: identity, work, beliefs, working-with-me
 Projects/    <- one note per thing the operator builds or runs
 Topics/      <- canonical concepts only (governed by scripts/ontology.yaml)
@@ -23,6 +24,7 @@ People/      <- one note per person; core people carry a position ledger
 Theses/      <- the operator's own evolving positions, dated, with counter-evidence
 Library/     <- processed reading and references (incl. podcasts/, youtube-likes/)
 Briefs/      <- generated pre-engagement briefs (query answers, filed back)
+Log/         <- append-only dated operator journal (decisions, lessons, ideas)
 Sources/     <- IMMUTABLE raw inputs: capture archive, feed pulls, X bookmarks
 _indexes/    <- machine-readable graph (appearances.json), lint reports
 Clippings/   <- inbox: Web Clipper + Obsidian mobile write here
@@ -31,6 +33,30 @@ tools/       <- vendored code the automation runs (xtap: X archive/search/RAG)
 scripts/     <- automation entry points; scripts/intelligence/ is the brain layer
 todos.md     <- open actions
 ```
+
+## Session bootstrap (load before you answer)
+
+On every non-trivial interactive session (strategy, prioritization, drafting in
+the operator's name, briefs, "what should I do", anything that depends on who
+they are):
+
+1. Read `Profile/00-overview.md` and `Profile/working-with-me.md` first (if they exist).
+2. Pull other `Profile/` notes as needed (`identity`, career/goals, interests).
+3. Prefer vault + Profile + Theses over generic model knowledge.
+
+Do not invent the operator's identity from training data when Profile notes or
+`config.json` exist. The vault wins.
+
+Thin queries that are pure vault lookups (a specific note, a person ledger
+slug) can skip the full Profile pass, but still follow standing voice rules.
+
+## If asked to bootstrap this repo
+
+Follow `SETUP.md` end to end. You may write `config.json`, seed `Profile/`,
+place secret files under the configured `secrets_dir` (never in the vault),
+edit `scripts/podcasts/shows.json`, run `scripts/bootstrap.sh` and
+`scripts/doctor.sh`, and install the launchd job after path rewrite. Do not
+push unless the operator says to.
 
 ## Intelligence layer (not an archive)
 
@@ -54,6 +80,32 @@ The vault is a decision instrument, not a pile of metadata. Consolidation rules:
 - **Lint** (`scripts/intelligence/lint.py`) periodically flags ledger gaps,
   ontology drift, dead concepts, and stale theses -> `_indexes/lint-report.md`.
 
+## Operator log (`Log/`)
+
+Append-only dated journal for decisions, lessons, killed ideas, and "remember
+this" moments. Not a second Topics tree and not a substitute for Theses.
+
+- File path: `Log/YYYY-MM-DD.md` (one file per day; create if missing).
+- Standing phrases that authorize a write without further permission:
+  - "log this" / "log this to my second brain"
+  - "remember this" / "remember this decision"
+  - "kill this idea" (log as a kill, with reason if given)
+- Allowed write surface for those phrases: **`Log/` only**, plus optional
+  checkboxes on `todos.md` if the entry implies an open action.
+- Do **not** mint Topics, edit Sources, or rewrite Profile/Theses from a log
+  command. Promote repeated log themes into Theses or Profile only when the
+  operator explicitly asks.
+- Entry shape:
+
+  ```
+  - **decision|lesson|idea|kill** (HH:MM): <one dense line>
+  ```
+
+CLI: `scripts/log.sh [decision|lesson|idea|kill] <text>` appends to today's file.
+
+Ideas without a log command still go to `Clippings/` or `Drafts/`, not a
+parallel Ideas/ folder.
+
 ## Ask the brain
 
 `scripts/ask.sh [-m claude|grok] "question"` routes a question to a CLI agent,
@@ -65,10 +117,10 @@ and reads selectively. `-s` saves the answer to `Briefs/`.
 Per-user values live in `config.json` (identity, browser, models, podcast
 cutoff, which sources are enabled), copied from `config.example.json`. Secrets
 never go in the vault or the config; they live in the `secrets_dir` (default
-`~/Developer/helpers`). To stand up a fresh brain: `bash scripts/bootstrap.sh`,
-then edit `config.json`, add secrets, auth X (`xtap auth browser`), and install
-the daily launchd job. Every ingest script reads `config.json` via
-`scripts/config.py`, so the operator's identity is injected, never hardcoded.
+`~/Developer/helpers`). Full checklist: `SETUP.md`. Quick path:
+`bash scripts/bootstrap.sh`, edit `config.json`, add secrets, auth X, run
+`scripts/doctor.sh`, install the daily job. Every ingest script reads
+`config.json` via `scripts/config.py`.
 
 ## Automation
 
@@ -76,7 +128,8 @@ the daily launchd job. Every ingest script reads `config.json` via
 Sources run independently (each toggled in `config.json` under `sources`), then
 one Claude pass files substantive items into the wiki and one local commit
 records everything. It syncs with the remote (pull --rebase before running, push
-when done) and never mutates the external accounts.
+when done) on the **current git branch** (master or main) and never mutates the
+external accounts except optional X-bookmark cleanup after successful process.
 
 - **X bookmarks** - vendored xtap CLI (`tools/xtap`; cookies and snapshots stay
   in `~/.xtap/`) -> `Sources/x-bookmarks/`
@@ -114,12 +167,15 @@ gates are mandatory for anything published under the operator's name.
 
 ## Rules
 
-1. **Query is read-only.** Answer from the vault and cite notes. Do not write
-   new notes unless the operator explicitly asks.
+1. **Query is read-only by default.** Answer from the vault and cite notes. Do
+   not write new notes unless the operator explicitly asks, **except** the
+   standing log phrases (append to `Log/` only), bootstrap/setup when asked, and
+   the daily ingest filing pass.
 2. **Sources/ is immutable.** Never edit anything under it.
 3. **Never rewrite note bodies.** When asked to file or restructure, you may
    add frontmatter, tags, and wikilinks, and re-file or re-title notes. Body
    text stays verbatim unless the operator asks for edits to a specific note.
+   `Log/` entries are append-only; do not rewrite prior log lines.
 4. **Clippings/ is the operator's inbox.** File a clipping into the right folder
    only when asked; archive the original under `Sources/` when you do.
 5. **Commit when a unit of work is done. Never push unless the operator says to.**
@@ -141,4 +197,4 @@ gates are mandatory for anything published under the operator's name.
 - Link with `[[wikilinks]]` (basename, optional `|label`). Kebab-case
   filenames. One concept per note; prefer many small interlinked notes.
 
-`CLAUDE.md` and `GROK.md` both forward here. Edit this file only.
+`CLAUDE.md`, `GROK.md`, and `CODEX.md` all forward here. Edit this file only.

@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
 # Daily multi-source ingest for the brain vault. Safe for launchd/cron.
 #
-# Sources run independently; one failing does not block the others:
-#   x-bookmarks  -> Sources/x-bookmarks/   (vendored xtap CLI)
+# Sources run independently (each toggled in config.json under sources); one
+# failing does not block the others:
+#   x_bookmarks  -> Sources/x-bookmarks/   (vendored xtap CLI)
 #   goodreads    -> Sources/goodreads/     (private all-shelves RSS)
 #   substack     -> Sources/substack/      (publication feed)
 #   github       -> Sources/github/        (gh CLI, recent commits)
 #   podcasts     -> Library/podcasts/      (new episodes, deep synthesis)
+#   youtube_likes -> Library/youtube-likes/
 #
 # Then, if anything new landed: one Claude pass enriches (follows links, does
 # web research) and files substantive items into the wiki (skip with
@@ -16,16 +18,19 @@
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+# shellcheck source=lib.sh
+source "$ROOT/scripts/lib.sh"
 LOG_DIR="$ROOT/.status"
 mkdir -p "$LOG_DIR"
 
-OPERATOR="$("$ROOT/.venv/bin/python3" "$ROOT/scripts/config.py" identity.name 2>/dev/null || echo 'the operator')"
+OPERATOR="$(brain_py "$ROOT/scripts/config.py" identity.name 2>/dev/null || echo 'the operator')"
 
 log() { printf '%s %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$*"; }
 
 cd "$ROOT"
-log "git pull --rebase"
-if ! git pull --rebase --autostash origin main; then
+BRANCH="$(brain_git_branch)"
+log "git pull --rebase origin $BRANCH"
+if ! brain_git_pull; then
   git rebase --abort 2>/dev/null || true
   log "ERROR: pull --rebase hit a conflict; aborting run, vault untouched"
   exit 1
@@ -41,10 +46,29 @@ run_source() {
   fi
 }
 
-run_source x-bookmarks "$ROOT/scripts/sources/x-bookmarks.sh"
-run_source goodreads "$ROOT/.venv/bin/python3" "$ROOT/scripts/goodreads_ingest.py"
-run_source substack "$ROOT/.venv/bin/python3" "$ROOT/scripts/substack_ingest.py"
-run_source github "$ROOT/.venv/bin/python3" "$ROOT/scripts/github_ingest.py" --days 3
+if brain_source_enabled x_bookmarks; then
+  run_source x-bookmarks "$ROOT/scripts/sources/x-bookmarks.sh"
+else
+  log "source: x-bookmarks skipped (config.sources.x_bookmarks=false)"
+fi
+
+if brain_source_enabled goodreads; then
+  run_source goodreads brain_py "$ROOT/scripts/goodreads_ingest.py"
+else
+  log "source: goodreads skipped (config.sources.goodreads=false)"
+fi
+
+if brain_source_enabled substack; then
+  run_source substack brain_py "$ROOT/scripts/substack_ingest.py"
+else
+  log "source: substack skipped (config.sources.substack=false)"
+fi
+
+if brain_source_enabled github; then
+  run_source github brain_py "$ROOT/scripts/github_ingest.py" --days 3
+else
+  log "source: github skipped (config.sources.github=false)"
+fi
 
 # PROCESS_OK gates platform cleanup: bookmarks are removed from X only after
 # they are both archived and processed (or there was nothing new to process).
@@ -61,37 +85,41 @@ else
       || log "WARN: claude processing failed; captures are still archived"
   fi
 
-  git add -A Sources Topics Library People
+  git add -A Sources Topics Library People Projects Profile
   git commit -m "Daily ingest $(date +%Y-%m-%d)" --quiet || log "nothing to commit"
 fi
 
-if [[ "${BRAIN_X_DELETE:-1}" == "1" && "$PROCESS_OK" == "1" ]]; then
+if [[ "${BRAIN_X_DELETE:-1}" == "1" && "$PROCESS_OK" == "1" ]] && brain_source_enabled x_bookmarks; then
   log "cleanup: removing archived+processed bookmarks from X"
-  "$ROOT/.venv/bin/python3" "$ROOT/scripts/x_bookmarks_cleanup.py" \
+  brain_py "$ROOT/scripts/x_bookmarks_cleanup.py" \
     || log "WARN: X bookmark cleanup failed; will retry next run"
 else
-  log "cleanup skipped (processing incomplete or BRAIN_X_DELETE=0)"
+  log "cleanup skipped (processing incomplete, source off, or BRAIN_X_DELETE=0)"
 fi
 
-log "git push"
-git push origin main || log "WARN: push failed; commits remain local"
+log "git push origin $BRANCH"
+brain_git_push || log "WARN: push failed; commits remain local"
 
 # New podcast episodes: only look back a couple weeks so old episodes trip the
 # stale-stop quickly. backfill.sh dedupes and self-commits/pushes.
-if [[ "${BRAIN_PODCASTS:-1}" == "1" ]] && command -v claude >/dev/null 2>&1; then
+if brain_source_enabled podcasts && [[ "${BRAIN_PODCASTS:-1}" == "1" ]] && command -v claude >/dev/null 2>&1; then
   log "podcasts: pulling new episodes"
   CUTOFF="$(date -v-14d +%Y%m%d 2>/dev/null || date -d '14 days ago' +%Y%m%d)" \
     STALE_STOP=3 "$ROOT/scripts/podcasts/backfill.sh" \
     >> "$LOG_DIR/podcasts.log" 2>&1 \
     || log "WARN: podcast pull failed; will retry next run"
+else
+  log "podcasts skipped (config or BRAIN_PODCASTS=0 or no claude)"
 fi
 
 # New long-form YouTube likes (live LL pull; only unprocessed >=20min are judged).
-if [[ "${BRAIN_LIKES:-1}" == "1" ]] && command -v claude >/dev/null 2>&1; then
+if brain_source_enabled youtube_likes && [[ "${BRAIN_LIKES:-1}" == "1" ]] && command -v claude >/dev/null 2>&1; then
   log "youtube-likes: pulling new likes"
   JOBS=2 "$ROOT/scripts/youtube_likes/run.sh" 1200 \
     >> "$LOG_DIR/youtube-likes.log" 2>&1 \
     || log "WARN: youtube-likes pull failed; will retry next run"
+else
+  log "youtube-likes skipped (config or BRAIN_LIKES=0 or no claude)"
 fi
 
 log "done"

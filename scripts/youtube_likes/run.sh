@@ -8,6 +8,8 @@
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+# shellcheck source=../lib.sh
+source "$ROOT/scripts/lib.sh"
 HERE="$ROOT/scripts/youtube_likes"
 mkdir -p "$ROOT/.status"
 LOCK="$ROOT/.status/podcasts.lock.d"   # shared YouTube-access lock
@@ -27,8 +29,8 @@ commit_push() {
   [[ -z "$(git status --porcelain Library People Topics)" ]] && return 0
   git add -A Library People Topics
   git commit -m "YouTube likes synthesis $(date +%Y-%m-%dT%H:%M)" --quiet || return 0
-  git pull --rebase --autostash origin main >/dev/null 2>&1 || git rebase --abort 2>/dev/null
-  git push origin main >/dev/null 2>&1 || log "WARN: push failed; commits local"
+  brain_git_pull >/dev/null 2>&1 || git -C "$ROOT" rebase --abort 2>/dev/null
+  brain_git_push >/dev/null 2>&1 || log "WARN: push failed; commits local"
 }
 
 MANIFEST="$(mktemp -t yt-likes.XXXX)"

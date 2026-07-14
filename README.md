@@ -6,9 +6,12 @@ script, and a daily job pulls from your accounts, uses an LLM to synthesize what
 actually matters, and files it into an interlinked knowledge graph you can ask
 questions of in plain language.
 
-Nothing about you is hardcoded. Your identity comes from `config.json`. Your
-notes are plain Markdown in a git repo you own, so any tool (Obsidian, Claude
-Code, Grok, an Obsidian plugin) can read and write them.
+Nothing about you is hardcoded. Your identity comes from `config.json` and
+`Profile/`. Your notes are plain Markdown in a git repo you own, so any tool
+(Obsidian, Claude Code, Grok, Codex) can read and write them.
+
+**Full setup (human or AI agent):** see [SETUP.md](SETUP.md).  
+**Vault contract for agents:** see [AGENTS.md](AGENTS.md).
 
 ## The idea, and why it is not a RAG chatbot
 
@@ -37,6 +40,9 @@ decision instrument:
 - **Briefs.** Before a meeting or a decision, one command produces a read on a
   person, company, or theme: their arc, their reversals, how it collides with
   your theses, an ask list, and kill criteria.
+- **Profile + Log.** Who you are (loaded before non-trivial answers) and an
+  append-only decision journal ("log this") so the brain compounds from both
+  passive capture and intentional writeback.
 
 That is the difference between a pile of notes and a brain.
 
@@ -48,127 +54,96 @@ Four layers. Data flows one direction.
             config.json  (identity, source toggles, secrets_dir)
                  |  read by scripts/config.py
                  v
-SOURCES  ─ingest→  Sources/ (immutable raw)  ─Claude filing pass→  wiki notes
+SOURCES  -ingest->  Sources/ (immutable raw)  -Claude filing pass->  wiki notes
  X bookmarks (xtap)                                                Topics/ People/
  Goodreads RSS                                                     Library/ Projects/
- Substack feed
+ Substack feed                                                     Profile/ Log/
  GitHub commits
- Podcasts (yt-dlp)  ─synth (AI)→  Library/podcasts/       ┐
- YouTube likes      ─synth (AI)→  Library/youtube-likes/  ├─build_links→ _indexes/appearances.json
-                                                          ┘
-INTELLIGENCE   build_ledger.sh (AI) → People/ position ledgers
-               brief.sh       (AI) → Briefs/ pre-engagement briefs
-               lint.py             → _indexes/lint-report.md
+ Podcasts (yt-dlp)  -synth (AI)->  Library/podcasts/       ┐
+ YouTube likes      -synth (AI)->  Library/youtube-likes/  +-build_links-> _indexes/
+                                                           ┘
+INTELLIGENCE   build_ledger.sh (AI) -> People/ position ledgers
+               brief.sh       (AI) -> Briefs/ pre-engagement briefs
+               lint.py             -> _indexes/lint-report.md
                  |
-INTERFACE      ask.sh (AI) → answers with [[citations]]
-               Obsidian    → browse and edit the vault directly
+INTERFACE      ask.sh / log.sh (AI + journal) -> answers with [[citations]]
+               Obsidian    -> browse and edit the vault directly
 ```
 
-1. **Sources.** Passive capture from where you already are: X bookmarks,
-   Goodreads shelves, your Substack posts, your GitHub commits, podcasts, and
-   YouTube likes. Everything lands in `Sources/`, which is immutable. That is the
-   raw record, never rewritten.
-2. **Ingest and synthesis.** A daily LLM pass reads the new captures, follows
-   their links, researches context, and files the substantive ones into the wiki
-   with tags and wikilinks. Podcasts and long-form videos get deep-synthesized
-   into structured notes (guests, dated claims, notable segments, ads stripped).
-3. **Intelligence.** Deterministic code builds a people-and-topics graph index;
-   the LLM builds position ledgers and briefs; a lint pass reports what needs
-   attention.
-4. **Interface.** Ask the vault anything in plain language (Claude or Grok), or
-   open it in Obsidian and browse the graph.
-
-## Where the AI does the work, and where it does not
-
-The LLM does judgment and synthesis. Deterministic code does the plumbing. There
-is no vector database. Retrieval is agentic grep-and-read: the model searches the
-files selectively, which is cheaper and needs no embedding infrastructure.
-
-Six places call an LLM (all shell out to the `claude` CLI; `ask.sh` also
-supports `grok`). Your identity is injected into each prompt from `config.json`:
-
-1. `scripts/ingest-daily.sh` runs the daily pass over new captures. It follows
-   links, researches context, analyzes second-order implications, and files the
-   substantive items with frontmatter and wikilinks.
-2. `scripts/podcasts/synth_episode.sh` turns one transcript into a deep note.
-3. `scripts/youtube_likes/synth_like.sh` judges whether a liked video is
-   substantive, then synthesizes a note only if it is.
-4. `scripts/intelligence/build_ledger.sh` builds a person's dated position ledger.
-5. `scripts/intelligence/brief.sh` writes a pre-engagement brief.
-6. `scripts/ask.sh` answers an arbitrary question against the vault, with citations.
-
-Everything else is plain code with no AI: the source ingesters, the graph index
-(`build_links.py`), transcript fetching, candidate selection, and the lint pass.
-Keeping synthesis in the model and plumbing in code is what keeps it debuggable
-and cheap.
-
-## Privacy and data ownership
-
-- Secrets (API keys, RSS keys, cookies) never live in the vault or the config.
-  They stay in a `secrets_dir` outside the repo. `config.json` is gitignored.
-- The vault is plain Markdown in a git repo you control, not a proprietary format
-  and not a cloud service. If you stop using this, your brain is still yours.
-- The AI steps send content to whichever model you configure. Point them at your
-  own key, or a local model, for anything sensitive.
-
-## Bootstrap
+## Bootstrap (quick)
 
 ```bash
-git clone <this-repo> second-brain && cd second-brain
-bash scripts/bootstrap.sh     # creates config.json, the venv, installs xtap + deps, folder structure
+git clone https://github.com/ArtSabintsev/bootstrap-your-second-brain.git second-brain
+cd second-brain
+bash scripts/bootstrap.sh
 
-$EDITOR config.json           # your name, context, interests, handles, browser
-# put secrets in your secrets_dir (e.g. the Goodreads RSS key)
-.venv/bin/xtap auth browser --browser <your-browser>   # log your X session into the tool
-$EDITOR scripts/podcasts/shows.json                    # the shows you follow
+# then:
+# 1. edit config.json
+# 2. place secrets (see secrets.example/README.md)
+# 3. fill Profile/
+# 4. xtap auth + gh auth as needed
+bash scripts/doctor.sh
 
-# install the daily job (macOS launchd; edit the path in the plist first):
 cp scripts/com.brain.ingest.plist ~/Library/LaunchAgents/
 launchctl load ~/Library/LaunchAgents/com.brain.ingest.plist
 ```
 
-Then use it:
+Point an AI agent at this repo and say "follow SETUP.md and bootstrap my second
+brain" if you want the interview-and-configure path.
+
+## Day-to-day
 
 ```bash
-scripts/ask.sh "what am I tracking on stablecoins?"      # query via Claude
-scripts/ask.sh -m grok "who disagrees with my AI thesis?" # or Grok
-scripts/intelligence/brief.sh some-person-slug            # a pre-engagement brief
+scripts/ask.sh "what am I tracking on stablecoins?"
+scripts/ask.sh -m grok "who disagrees with my AI thesis?"
+scripts/log.sh decision "killed idea X because Y"
+scripts/intelligence/brief.sh some-person-slug
+bash scripts/doctor.sh
 ```
-
-Or open the vault in Obsidian and browse. For a chat sidebar that runs the same
-`claude` agent inside Obsidian, install the community plugin "Claudian."
 
 ## Prerequisites
 
-- Python 3 (the venv is created by `bootstrap.sh`).
-- The `claude` CLI on PATH (and optionally `grok`) for the AI steps.
-- The `gh` CLI, authenticated, for the GitHub source.
-- `yt-dlp` (installed by bootstrap) for podcast and YouTube transcripts.
-- A browser with a logged-in X session (for `xtap` and YouTube-likes pulls).
-- macOS launchd for the daily job, or adapt `ingest-daily.sh` to cron on Linux.
-- Obsidian to browse and edit the vault (optional but intended).
+- Python 3 (venv created by `bootstrap.sh`)
+- `claude` CLI on PATH (and optionally `grok`) for AI steps
+- `gh` CLI, authenticated, if `sources.github` is on
+- `yt-dlp` (installed by bootstrap) for podcast and YouTube transcripts
+- Browser with a logged-in X session (for xtap and YouTube-likes)
+- macOS launchd for the daily job, or adapt `ingest-daily.sh` to cron
+- Obsidian to browse and edit (optional but intended)
 
 ## Layout
 
 ```
-config.example.json   copy to config.json (gitignored) and fill in
-AGENTS.md             the vault contract: schema, rules, intelligence layer
-CLAUDE.md / GROK.md   thin entry points that forward to AGENTS.md
-scripts/              all automation (see "Where the AI does the work")
-  config.py           per-user config loader
-  bootstrap.sh        one-time setup
-  ingest-daily.sh     the daily orchestrator
+SETUP.md              full bootstrap walkthrough (human + AI)
+config.example.json   copy to config.json (gitignored)
+secrets.example/      documents secrets_dir layout (no real secrets)
+AGENTS.md             vault contract for agents
+CLAUDE.md / GROK.md / CODEX.md   thin entry points -> AGENTS.md
+scripts/
+  bootstrap.sh        one-time setup + Profile seeds + plist path
+  doctor.sh           health checks for config, sources, CLIs
+  lib.sh              shared helpers (branch, source toggles)
+  ingest-daily.sh     daily orchestrator (honors config.sources)
   ask.sh              query the vault
-  ontology.yaml       the closed canonical-concept registry (you grow it)
-  intelligence/       ledgers, briefs, lint (the decision layer)
-  podcasts/ youtube_likes/ sources/   the ingest + synthesis pipelines
-tools/xtap/           vendored CLI that taps X (archive, search, RAG source)
-Sources/ Topics/ People/ Theses/ Library/ Briefs/ Drafts/ _indexes/   the vault
+  log.sh              append to Log/YYYY-MM-DD.md
+  ontology.yaml       closed canonical-concept registry
+  intelligence/       ledgers, briefs, lint
+  podcasts/ youtube_likes/ sources/
+tools/xtap/           vendored X CLI
+Profile/ Projects/ Log/ Sources/ Topics/ People/ Theses/
+Library/ Briefs/ Drafts/ Clippings/ _indexes/
 ```
+
+## Privacy and data ownership
+
+- Secrets never live in the vault or config. They stay in `secrets_dir`.
+- The vault is plain Markdown in a git repo you control.
+- AI steps send content to whichever model the CLIs use. Point them at your own
+  keys or local models for sensitive material.
 
 ## Status
 
-This is a working system, extracted from a private personal vault and stripped
-of its content. The config-driven design means it runs for anyone. Start in
-`scripts/intelligence/` to see the part that is genuinely novel: the ledgers,
-theses, and briefs that track how thinking changes over time.
+Working system, extracted from a private personal vault and stripped of content.
+Config-driven so it runs for anyone. The intelligence layer under
+`scripts/intelligence/` is the novel part: ledgers, theses, and briefs that track
+how thinking changes over time.

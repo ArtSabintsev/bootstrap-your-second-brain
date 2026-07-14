@@ -5,6 +5,7 @@ config.json
 .venv/
 __pycache__/
 *.egg-info/
+*.pyc
 
 # Machine-local pipeline state (run logs, skip logs)
 .status/
@@ -13,6 +14,12 @@ __pycache__/
 _indexes/*
 !_indexes/.gitkeep
 
-# Obsidian per-device state (keep plugins/themes/settings tracked)
+# Local operator log day files are fine to commit; ignore nothing under Log/
+
+# Obsidian per-device state
 .obsidian/
 .DS_Store
+
+# Local scratch / marketing decks that must not ship in the template
+Drafts/**/*
+!Drafts/.gitkeep
