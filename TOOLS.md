@@ -17,6 +17,7 @@ add a new source without inventing architecture.
 |------|------|----------------|
 | **[Obsidian](https://obsidian.md)** | Primary vault UI: graph, search, wikilinks, mobile | Open this repo folder as the vault. Title Case folders (`Profile/`, `Topics/`, …) are meant to be browsed as notes, not as a hidden database. |
 | **[Claudian](https://github.com/YishenTu/claudian)** (community id: `realclaudian`) | Claude agent chat *inside* Obsidian, same filesystem as the vault | Install from Community plugins as **Claudian** (plugin id `realclaudian`, by Yishen Tu). Point it at this vault so it can Read/Write notes under AGENTS.md rules. Complements terminal `claude` / `ask.sh`; does not replace daily ingest. |
+| **[Omnisearch](https://github.com/scambier/obsidian-omnisearch)** (community id: `omnisearch`) | Fast vault search (full text + fuzzy) | **Shipped** under `.obsidian/plugins/omnisearch/`. Enabled in `community-plugins.json`. Default hotkey: **Cmd+K** / **Ctrl+K** → Omnisearch vault search (`hotkeys.json`). |
 | **[Obsidian Web Clipper](https://obsidian.md/clipper)** | Capture web pages into the inbox | Configure the clipper to write into `Clippings/`. Agents file from Clippings only when asked (rule 4). Raw clips stay in Clippings until filed; archive originals under `Sources/` when filing. |
 | **Claude Code / Grok CLI / Codex** | Terminal agents that load CLAUDE.md → AGENTS.md | Primary automation harnesses for setup, ask, synth, briefs. Any agent that reads `AGENTS.md` + `SETUP.md` is supported. |
 | **`gh` CLI** | Authenticated GitHub API for the github source | Required only if `sources.github` is true. |
@@ -30,7 +31,7 @@ Browser (logged into X / YouTube)
     v
 Daily scrapers  -->  Sources/ (immutable)  -->  Claude filing  -->  wiki notes
 Web Clipper     -->  Clippings/ (inbox)     -->  human/agent file on request
-Obsidian        -->  browse/edit all folders
+Obsidian        -->  browse/edit all folders (Omnisearch: Cmd/Ctrl+K)
 Claudian / CLIs -->  ask, log, brief, setup (same files)
 ```
 

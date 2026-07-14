@@ -26,7 +26,7 @@ You are standing up a personal vault, not answering a one-shot query.
 5. Edit `scripts/podcasts/shows.json` to match shows they follow.
 6. Run `scripts/bootstrap.sh`, `scripts/doctor.sh`, auth commands (`xtap`, `gh`).
 7. Install the launchd plist after bootstrap rewrote the vault path.
-8. Recommend Obsidian + Claudian + Web Clipper from TOOLS.md.
+8. Recommend Obsidian + Claudian + Web Clipper from TOOLS.md. Omnisearch ships in the vault (Cmd/Ctrl+K).
 
 **You must not:**
 
@@ -49,6 +49,7 @@ If a value is missing, **ask**. Placeholders in `config.example.json` are not re
 | macOS (for launchd) or cron | daily job |
 | **Obsidian** | browse/edit the vault (recommended) |
 | **Claudian** (Obsidian plugin id `realclaudian`) | in-vault Claude agent (recommended); https://github.com/YishenTu/claudian |
+| **Omnisearch** (plugin id `omnisearch`) | vault search; **shipped** in repo; **Cmd/Ctrl+K** |
 | **Obsidian Web Clipper** | capture pages into `Clippings/` (recommended) |
 
 Details and install notes: [[TOOLS]].
@@ -124,7 +125,7 @@ these first).
 
 Recommend the operator install (from TOOLS.md):
 
-1. **Obsidian** → Open vault = this repo folder.
+1. **Obsidian** → Open vault = this repo folder. Omnisearch is already in `.obsidian/plugins/` (vault search: **Cmd+K** / **Ctrl+K**). Enable community plugins if prompted.
 2. **Claudian** community plugin (id `realclaudian`, repo YishenTu/claudian) → chat against the same files.
 3. **Obsidian Web Clipper** → save targets to `Clippings/`.
 

@@ -17,7 +17,7 @@ Nothing about you is hardcoded. Identity comes from `config.json` and
 | Start here | Purpose |
 |------------|---------|
 | [[SETUP]] | Bootstrap path (human + every agent harness) |
-| [[TOOLS]] | Obsidian, Claudian, Web Clipper, scrapers, adding ingestors |
+| [[TOOLS]] | Obsidian, Claudian, Omnisearch, Web Clipper, scrapers, adding ingestors |
 | [[AGENTS]] | Vault contract agents must load |
 | `config.example.json` | Field docs in `_fields`; copy → `config.json` |
 
@@ -27,6 +27,7 @@ Nothing about you is hardcoded. Identity comes from `config.json` and
   dirs are for human browsing).
 - **[Claudian](https://github.com/YishenTu/claudian)** (Community Plugins id: `realclaudian`) — Claude agent chat
   inside Obsidian against the same files.
+- **[Omnisearch](https://github.com/scambier/obsidian-omnisearch)** — vault search (shipped). Hotkey: **Cmd+K** / **Ctrl+K**.
 - **[Obsidian Web Clipper](https://obsidian.md/clipper)** — save pages into
   `Clippings/` (inbox; file when you ask).
 - Terminal agents load `CLAUDE.md` → `AGENTS.md` (Grok/Codex symlinks included).
