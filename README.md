@@ -27,7 +27,8 @@ Nothing about you is hardcoded. Identity comes from `config.json` and
   dirs are for human browsing).
 - **[Claudian](https://github.com/YishenTu/claudian)** (Community Plugins id: `realclaudian`) — Claude agent chat
   inside Obsidian against the same files.
-- **[Omnisearch](https://github.com/scambier/obsidian-omnisearch)** — vault search (shipped). Hotkey: **Cmd+K** / **Ctrl+K**.
+- **[Omnisearch](https://github.com/scambier/obsidian-omnisearch)** — vault search (bootstrap installs). Hotkey: **Cmd+K** / **Ctrl+K**.
+- **[Ghostty Terminal](https://github.com/lavs9/obsidian-ghostty-terminal)** — embedded terminal (bootstrap installs).
 - **[Obsidian Web Clipper](https://obsidian.md/clipper)** — save pages into
   `Clippings/` (inbox; file when you ask).
 - Terminal agents load `CLAUDE.md` → `AGENTS.md` (Grok/Codex symlinks included).

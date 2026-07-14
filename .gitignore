@@ -16,15 +16,13 @@ _indexes/*
 
 # Local operator log day files are fine to commit; ignore nothing under Log/
 
-# Obsidian per-device state (keep plugins/themes/settings tracked)
+# Obsidian per-device state (settings/hotkeys tracked; plugin *builds* installed by bootstrap)
 .obsidian/workspace.json
 .obsidian/workspace-mobile.json
 .obsidian/graph.json
 .obsidian/cache
+.obsidian/plugins/
 .DS_Store
-
-# Large / fast-moving community plugin builds (install via Community Plugins)
-.obsidian/plugins/realclaudian/
 
 # Local scratch / marketing decks that must not ship in the template
 Drafts/**/*

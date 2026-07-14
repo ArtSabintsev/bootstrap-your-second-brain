@@ -16,8 +16,9 @@ add a new source without inventing architecture.
 | Tool | Role | Where it fits |
 |------|------|----------------|
 | **[Obsidian](https://obsidian.md)** | Primary vault UI: graph, search, wikilinks, mobile | Open this repo folder as the vault. Title Case folders (`Profile/`, `Topics/`, …) are meant to be browsed as notes, not as a hidden database. |
-| **[Claudian](https://github.com/YishenTu/claudian)** (community id: `realclaudian`) | Claude agent chat *inside* Obsidian, same filesystem as the vault | Install from Community plugins as **Claudian** (plugin id `realclaudian`, by Yishen Tu). Point it at this vault so it can Read/Write notes under AGENTS.md rules. Complements terminal `claude` / `ask.sh`; does not replace daily ingest. |
-| **[Omnisearch](https://github.com/scambier/obsidian-omnisearch)** (community id: `omnisearch`) | Fast vault search (full text + fuzzy) | **Shipped** under `.obsidian/plugins/omnisearch/`. Enabled in `community-plugins.json`. Default hotkey: **Cmd+K** / **Ctrl+K** → Omnisearch vault search (`hotkeys.json`). |
+| **[Claudian](https://github.com/YishenTu/claudian)** (community id: `realclaudian`) | Claude agent chat *inside* Obsidian, same filesystem as the vault | **Installed by** `scripts/bootstrap.sh` (or Community Plugins: id `realclaudian`, Yishen Tu). Point it at this vault. Complements terminal `claude` / `ask.sh`; does not replace daily ingest. |
+| **[Omnisearch](https://github.com/scambier/obsidian-omnisearch)** (community id: `omnisearch`) | Fast vault search (full text + fuzzy) | **Installed by** `scripts/bootstrap.sh` (build not in git). Enabled in `community-plugins.json`. Hotkey: **Cmd+K** / **Ctrl+K** → vault search (`hotkeys.json`). |
+| **[Ghostty Terminal](https://github.com/lavs9/obsidian-ghostty-terminal)** (community id: `ghostty-terminal`) | Embedded terminal in Obsidian | **Installed by** `scripts/bootstrap.sh`. Needs Python 3 for PTY helper. Desktop only. |
 | **[Obsidian Web Clipper](https://obsidian.md/clipper)** | Capture web pages into the inbox | Configure the clipper to write into `Clippings/`. Agents file from Clippings only when asked (rule 4). Raw clips stay in Clippings until filed; archive originals under `Sources/` when filing. |
 | **Claude Code / Grok CLI / Codex** | Terminal agents that load CLAUDE.md → AGENTS.md | Primary automation harnesses for setup, ask, synth, briefs. Any agent that reads `AGENTS.md` + `SETUP.md` is supported. |
 | **`gh` CLI** | Authenticated GitHub API for the github source | Required only if `sources.github` is true. |
@@ -37,6 +38,14 @@ Claudian / CLIs -->  ask, log, brief, setup (same files)
 
 Nothing about this requires a proprietary host. If you leave the tools, you keep
 the Markdown git repo.
+
+### Obsidian plugins (bootstrap installs builds)
+
+`.obsidian/community-plugins.json` and `.obsidian/hotkeys.json` are tracked.
+Plugin **builds** under `.obsidian/plugins/` are **not** in git — `scripts/bootstrap.sh`
+downloads them (Omnisearch, Ghostty Terminal, Claudian). Re-run bootstrap or the
+install step after clone; enable Restricted-mode-off in Obsidian once.
+
 
 ## Built-in scrapers (sources)
 

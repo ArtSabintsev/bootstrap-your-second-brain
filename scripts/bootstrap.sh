@@ -213,11 +213,52 @@ else:
 PY
 fi
 
+# 7. Obsidian community plugins (builds stay untracked; config is in .obsidian/)
+# Declared in .obsidian/community-plugins.json; hotkeys in .obsidian/hotkeys.json.
+install_obsidian_plugin() {
+  local id="$1" repo="$2"
+  shift 2
+  local dest=".obsidian/plugins/$id"
+  mkdir -p "$dest"
+  local f url
+  for f in "$@"; do
+    if [[ "$f" == *://* ]]; then
+      # optional extra: "filename|url"
+      local name="${f%%|*}"
+      url="${f#*|}"
+      if [[ ! -f "$dest/$name" ]]; then
+        echo "  downloading $id/$name"
+        curl -fsSL "$url" -o "$dest/$name"
+      fi
+    else
+      url="https://github.com/${repo}/releases/latest/download/${f}"
+      if [[ ! -f "$dest/$f" ]]; then
+        echo "  downloading $id/$f"
+        curl -fsSL "$url" -o "$dest/$f"
+      fi
+    fi
+  done
+  if [[ -f "$dest/manifest.json" ]]; then
+    echo "  ok $id ($(python3 -c "import json; print(json.load(open('$dest/manifest.json'))['version'])" 2>/dev/null || echo '?'))"
+  else
+    echo "  WARN: $id missing manifest.json" >&2
+  fi
+}
+
+echo "installing Obsidian plugins into .obsidian/plugins/ ..."
+install_obsidian_plugin omnisearch scambier/obsidian-omnisearch \
+  main.js manifest.json styles.css
+install_obsidian_plugin ghostty-terminal lavs9/obsidian-ghostty-terminal \
+  main.js manifest.json styles.css \
+  "pty_helper.py|https://raw.githubusercontent.com/lavs9/obsidian-ghostty-terminal/main/pty_helper.py"
+install_obsidian_plugin realclaudian YishenTu/claudian \
+  main.js manifest.json styles.css
+
 chmod +x scripts/*.sh scripts/intelligence/*.sh scripts/podcasts/*.sh scripts/youtube_likes/*.sh scripts/sources/*.sh 2>/dev/null || true
 
 cat <<EOF
 
-Bootstrap complete. Next steps (full guide: SETUP.md):
+Bootstrap complete (incl. Obsidian plugins if network ok). Next steps (SETUP.md):
   1. Edit config.json      (identity, browser=$BROWSER, secrets_dir, sources)
   2. Secrets -> $SECRETS   (e.g. goodreads/rss-key). Never in the vault.
   3. Fill Profile/         (00-overview.md, working-with-me.md)
