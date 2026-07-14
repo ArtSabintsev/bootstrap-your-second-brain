@@ -68,6 +68,19 @@ def secrets_dir() -> Path:
     return Path(os.path.expanduser(get("secrets_dir", "~/Developer/helpers")))
 
 
+def browser(default: str = "brave") -> str:
+    """Browser name for xtap and yt-dlp --cookies-from-browser."""
+    val = get("browser", default)
+    if val is None or str(val).strip() == "":
+        return default
+    return str(val).strip().lower()
+
+
+def ytdlp_cookie_args() -> list[str]:
+    """Args so yt-dlp uses the same browser session as config.browser."""
+    return ["--cookies-from-browser", browser()]
+
+
 def source_enabled(key: str, default: bool = True) -> bool:
     """Whether config.sources.<key> is on. Missing key => default (True)."""
     val = get(f"sources.{key}", default)
@@ -101,6 +114,10 @@ if __name__ == "__main__":
         sys.exit(0)
     if args and args[0] == "--is-placeholder":
         print("true" if is_placeholder_identity() else "false")
+        sys.exit(0)
+    if args and args[0] == "--ytdlp-cookies":
+        # Space-separated flags for shell scripts if needed
+        print(" ".join(ytdlp_cookie_args()))
         sys.exit(0)
     val = get(args[0]) if args else CFG
     if isinstance(val, (dict, list)):

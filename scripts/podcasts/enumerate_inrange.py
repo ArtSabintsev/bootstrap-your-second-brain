@@ -18,19 +18,22 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 BRAIN = HERE.parent.parent
+sys.path.insert(0, str(BRAIN / "scripts"))
+from config import ytdlp_cookie_args  # noqa: E402
+
 YTDLP = str(BRAIN / ".venv" / "bin" / "yt-dlp")
 
 
 # YouTube throttles unauthenticated bulk access (HTTP 429 + bot check), so
-# authenticate with the browser session and tolerate format-unavailable errors
-# (we only want metadata, not media).
-COOKIES = ["--cookies-from-browser", "brave", "--ignore-no-formats-error",
-           "--sleep-requests", "1"]
+# authenticate with the browser session (config.browser) and tolerate
+# format-unavailable errors (we only want metadata, not media).
+def _cookies() -> list[str]:
+    return [*ytdlp_cookie_args(), "--ignore-no-formats-error", "--sleep-requests", "1"]
 
 
 def flat_ids(url: str) -> list[str]:
     out = subprocess.run(
-        [YTDLP, *COOKIES, "--flat-playlist", "--print", "%(id)s", url],
+        [YTDLP, *_cookies(), "--flat-playlist", "--print", "%(id)s", url],
         capture_output=True, text=True,
     )
     return [x for x in out.stdout.splitlines() if x.strip()]
@@ -38,7 +41,7 @@ def flat_ids(url: str) -> list[str]:
 
 def meta(vid: str) -> tuple[str, str, str] | None:
     out = subprocess.run(
-        [YTDLP, *COOKIES, "--skip-download", "--no-write-subs",
+        [YTDLP, *_cookies(), "--skip-download", "--no-write-subs",
          "--print", "%(upload_date)s\t%(title)s", vid],
         capture_output=True, text=True,
     )

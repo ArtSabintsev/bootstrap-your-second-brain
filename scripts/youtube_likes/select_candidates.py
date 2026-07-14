@@ -18,6 +18,9 @@ import sys
 from pathlib import Path
 
 VAULT = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(VAULT / "scripts"))
+from config import ytdlp_cookie_args  # noqa: E402
+
 YTDLP = str(VAULT / ".venv" / "bin" / "yt-dlp")
 NOTES_DIR = VAULT / "Library" / "youtube-likes"
 SKIP_LOG = VAULT / ".status" / "youtube-likes-skip.log"
@@ -36,7 +39,7 @@ def processed_ids() -> set[str]:
 def main() -> int:
     threshold = int(sys.argv[1]) if len(sys.argv) > 1 else 1200
     out = subprocess.run(
-        [YTDLP, "--cookies-from-browser", "brave", "--flat-playlist",
+        [YTDLP, *ytdlp_cookie_args(), "--flat-playlist",
          "--print", "%(id)s\t%(duration)s\t%(channel)s\t%(title)s", LL],
         capture_output=True, text=True,
     )

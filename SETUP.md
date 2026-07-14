@@ -48,7 +48,7 @@ If a value is missing, **ask**. Placeholders in `config.example.json` are not re
 | Browser with logged-in X session | xtap bookmarks (+ YouTube for likes) |
 | macOS (for launchd) or cron | daily job |
 | **Obsidian** | browse/edit the vault (recommended) |
-| **Claudian** (Obsidian plugin) | in-vault Claude agent (recommended) |
+| **Claudian** (Obsidian plugin id `realclaudian`) | in-vault Claude agent (recommended); https://github.com/YishenTu/claudian |
 | **Obsidian Web Clipper** | capture pages into `Clippings/` (recommended) |
 
 Details and install notes: [[TOOLS]].
@@ -125,7 +125,7 @@ these first).
 Recommend the operator install (from TOOLS.md):
 
 1. **Obsidian** → Open vault = this repo folder.
-2. **Claudian** community plugin → chat against the same files.
+2. **Claudian** community plugin (id `realclaudian`, repo YishenTu/claudian) → chat against the same files.
 3. **Obsidian Web Clipper** → save targets to `Clippings/`.
 
 ## Step 6. Doctor

@@ -8,7 +8,7 @@
     "identity.github_login": "GitHub username for sources.github.",
     "identity.goodreads_user_id": "Numeric id from the Goodreads profile URL. Required only if sources.goodreads is true.",
     "identity.substack_feed": "Full publication RSS URL. Required only if sources.substack is true; otherwise set sources.substack false.",
-    "browser": "Browser name for xtap cookie import: brave, chrome, chromium, firefox, edge, safari (platform-dependent).",
+    "browser": "Browser for xtap AND yt-dlp cookies (podcasts, youtube_likes): brave, chrome, chromium, firefox, edge, safari.",
     "secrets_dir": "Absolute or ~ path outside the vault for secret files. Default ~/Developer/helpers.",
     "models.process": "Hint for model id used by some synth/ledger scripts via env defaults; CLIs may override.",
     "podcasts.cutoff": "YYYYMMDD floor for podcast backfill (episodes older than this are skipped).",

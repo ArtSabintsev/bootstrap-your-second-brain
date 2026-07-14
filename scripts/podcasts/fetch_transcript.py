@@ -22,6 +22,9 @@ import tempfile
 from pathlib import Path
 
 BRAIN = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(BRAIN / "scripts"))
+from config import ytdlp_cookie_args  # noqa: E402
+
 YTDLP = str(BRAIN / ".venv" / "bin" / "yt-dlp")
 
 _TS = re.compile(r"-->")
@@ -52,7 +55,7 @@ def fetch(video: str, out_path: str) -> tuple[str, str] | None:
     with tempfile.TemporaryDirectory() as td:
         proc = subprocess.run(
             [
-                YTDLP, "--cookies-from-browser", "brave", "--ignore-no-formats-error",
+                YTDLP, *ytdlp_cookie_args(), "--ignore-no-formats-error",
                 "--sleep-requests", "1.5", "--extractor-retries", "2",
                 "--js-runtimes", "node", "--skip-download",
                 "--write-auto-subs", "--sub-lang", "en", "--sub-format", "vtt",

@@ -104,7 +104,8 @@ class TestAgentDocs(unittest.TestCase):
         self.assertIn("profile", claude)
 
     def test_tools_documents_stack_and_scrapers(self):
-        tools = (ROOT / "TOOLS.md").read_text().lower()
+        tools = (ROOT / "TOOLS.md").read_text()
+        tools_l = tools.lower()
         for needle in (
             "obsidian",
             "claudian",
@@ -120,7 +121,16 @@ class TestAgentDocs(unittest.TestCase):
             "how to add a new ingestor",
             "tools/",
         ):
-            self.assertIn(needle, tools, msg=f"TOOLS.md missing: {needle}")
+            self.assertIn(needle, tools_l, msg=f"TOOLS.md missing: {needle}")
+        self.assertIn("https://github.com/YishenTu/claudian", tools)
+        self.assertIn("realclaudian", tools)
+        self.assertNotIn("Senundina/claudian", tools)
+
+    def test_readme_claudian_link(self):
+        readme = (ROOT / "README.md").read_text()
+        self.assertIn("https://github.com/YishenTu/claudian", readme)
+        self.assertIn("realclaudian", readme)
+        self.assertNotIn("Senundina/claudian", readme)
 
     def test_agents_session_and_log_rules(self):
         agents = (ROOT / "AGENTS.md").read_text().lower()
@@ -128,6 +138,42 @@ class TestAgentDocs(unittest.TestCase):
         self.assertIn("profile/", agents)
         self.assertIn("log/", agents)
         self.assertIn("if asked to bootstrap", agents)
+
+
+class TestBrowserCookies(unittest.TestCase):
+    """yt-dlp cookie browser must come from config.browser, not a hardcoded name."""
+
+    HARDCODED_SCRIPTS = (
+        "scripts/youtube_likes/select_candidates.py",
+        "scripts/podcasts/enumerate_inrange.py",
+        "scripts/podcasts/fetch_transcript.py",
+    )
+
+    def test_ytdlp_cookie_args_uses_config_browser(self):
+        args = brain_config.ytdlp_cookie_args()
+        self.assertEqual(args[0], "--cookies-from-browser")
+        self.assertEqual(args[1], brain_config.browser())
+        self.assertNotEqual(args[1], "")
+
+    def test_no_hardcoded_brave_cookie_flag_in_ytdlp_scripts(self):
+        for rel in self.HARDCODED_SCRIPTS:
+            text = (ROOT / rel).read_text()
+            self.assertNotRegex(
+                text,
+                r'["\']--cookies-from-browser["\']\s*,\s*["\']brave["\']',
+                msg=f"{rel} still hardcodes brave cookies",
+            )
+            self.assertIn("ytdlp_cookie_args", text, msg=f"{rel} must call ytdlp_cookie_args()")
+
+    def test_tools_claims_browser_drives_ytdlp(self):
+        tools = (ROOT / "TOOLS.md").read_text().lower()
+        self.assertIn("yt-dlp", tools)
+        self.assertIn("config.browser", tools.replace("`", "").replace(" ", "") or tools)
+        # either form
+        self.assertTrue(
+            "config.browser" in (ROOT / "TOOLS.md").read_text()
+            or "config.json" in tools and "yt-dlp" in tools
+        )
 
 
 class TestShellSyntax(unittest.TestCase):

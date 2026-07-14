@@ -16,11 +16,11 @@ add a new source without inventing architecture.
 | Tool | Role | Where it fits |
 |------|------|----------------|
 | **[Obsidian](https://obsidian.md)** | Primary vault UI: graph, search, wikilinks, mobile | Open this repo folder as the vault. Title Case folders (`Profile/`, `Topics/`, …) are meant to be browsed as notes, not as a hidden database. |
-| **[Claudian](https://github.com/Senundina/claudian)** (community plugin) | Claude agent chat *inside* Obsidian, same filesystem as the vault | Install from Community plugins. Point it at this vault so it can Read/Write notes under AGENTS.md rules. Complements terminal `claude` / `ask.sh`; does not replace daily ingest. |
+| **[Claudian](https://github.com/YishenTu/claudian)** (community id: `realclaudian`) | Claude agent chat *inside* Obsidian, same filesystem as the vault | Install from Community plugins as **Claudian** (plugin id `realclaudian`, by Yishen Tu). Point it at this vault so it can Read/Write notes under AGENTS.md rules. Complements terminal `claude` / `ask.sh`; does not replace daily ingest. |
 | **[Obsidian Web Clipper](https://obsidian.md/clipper)** | Capture web pages into the inbox | Configure the clipper to write into `Clippings/`. Agents file from Clippings only when asked (rule 4). Raw clips stay in Clippings until filed; archive originals under `Sources/` when filing. |
 | **Claude Code / Grok CLI / Codex** | Terminal agents that load CLAUDE.md → AGENTS.md | Primary automation harnesses for setup, ask, synth, briefs. Any agent that reads `AGENTS.md` + `SETUP.md` is supported. |
 | **`gh` CLI** | Authenticated GitHub API for the github source | Required only if `sources.github` is true. |
-| **Browser (Brave/Chrome/Firefox)** | Cookie source for xtap (X session) and YouTube | Set `browser` in config.json. Must be logged into X (and YouTube for likes). |
+| **Browser (Brave/Chrome/Firefox)** | Cookie source for xtap (X) and yt-dlp (podcasts + YouTube likes) | Set `browser` in config.json. Same value drives `xtap auth browser` and `yt-dlp --cookies-from-browser`. Must be logged into X and YouTube. |
 
 ### How the pieces relate
 
@@ -93,7 +93,7 @@ orchestrator is `scripts/ingest-daily.sh`. Disabled sources are skipped cleanly.
 | **Auth** | YouTube access via yt-dlp (rate-limited; shares lock with likes) |
 | **Input** | Episode list + auto-captions |
 | **Output** | Deep notes under `Library/podcasts/<show>/`; graph index via build_links |
-| **Deps** | yt-dlp, claude CLI for synthesis, shows.json |
+| **Deps** | yt-dlp (cookies via `config.browser`), claude CLI for synthesis, shows.json |
 
 ### 6. YouTube likes (`sources.youtube_likes`)
 
@@ -103,7 +103,7 @@ orchestrator is `scripts/ingest-daily.sh`. Disabled sources are skipped cleanly.
 | **Auth** | Browser/YouTube session (same ecosystem as podcasts; shared lock) |
 | **Input** | Liked-videos playlist, live each run (no stored full catalog) |
 | **Output** | Substantive long-form notes under `Library/youtube-likes/`; skip log in `.status/` |
-| **Deps** | yt-dlp, claude CLI (judges music/gameplay out) |
+| **Deps** | yt-dlp (cookies via `config.browser`), claude CLI (judges music/gameplay out) |
 
 ### After capture: filing and intelligence
 

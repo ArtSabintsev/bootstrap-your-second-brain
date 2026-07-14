@@ -25,7 +25,7 @@ Nothing about you is hardcoded. Identity comes from `config.json` and
 
 - **[Obsidian](https://obsidian.md)** — open this folder as the vault (Title Case
   dirs are for human browsing).
-- **[Claudian](https://github.com/Senundina/claudian)** — Claude agent chat
+- **[Claudian](https://github.com/YishenTu/claudian)** (Community Plugins id: `realclaudian`) — Claude agent chat
   inside Obsidian against the same files.
 - **[Obsidian Web Clipper](https://obsidian.md/clipper)** — save pages into
   `Clippings/` (inbox; file when you ask).
