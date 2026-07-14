@@ -1,5 +1,24 @@
 {
-  "_comment": "Copy to config.json (gitignored) and fill in. Secrets never go here; see secrets.example/README.md and SETUP.md. Disable any sources you will not configure.",
+  "_comment": "Copy this file to config.json (gitignored). Humans and agents both edit config.json. Keys starting with _ are documentation only and are ignored by scripts/config.py. Secrets never go here; see secrets.example/README.md and SETUP.md.",
+  "_fields": {
+    "identity.name": "Display name injected into AI prompts (ask, brief, ingest). Required. Interview the operator; never invent.",
+    "identity.context": "One line: role and focus for pre-engagement briefs (e.g. early-stage VC focused on AI infra).",
+    "identity.interests": "Array of short topic tags. Seeds Profile and personalizes youtube-likes judgment context.",
+    "identity.git_emails": "Emails that identify the operator's own commits for the github source.",
+    "identity.github_login": "GitHub username for sources.github.",
+    "identity.goodreads_user_id": "Numeric id from the Goodreads profile URL. Required only if sources.goodreads is true.",
+    "identity.substack_feed": "Full publication RSS URL. Required only if sources.substack is true; otherwise set sources.substack false.",
+    "browser": "Browser name for xtap cookie import: brave, chrome, chromium, firefox, edge, safari (platform-dependent).",
+    "secrets_dir": "Absolute or ~ path outside the vault for secret files. Default ~/Developer/helpers.",
+    "models.process": "Hint for model id used by some synth/ledger scripts via env defaults; CLIs may override.",
+    "podcasts.cutoff": "YYYYMMDD floor for podcast backfill (episodes older than this are skipped).",
+    "sources.x_bookmarks": "true/false. X bookmarks via vendored xtap. Needs browser login + xtap auth.",
+    "sources.goodreads": "true/false. Goodreads RSS. Needs goodreads_user_id + secrets_dir/goodreads/rss-key.",
+    "sources.substack": "true/false. Substack publication archive. Needs identity.substack_feed.",
+    "sources.github": "true/false. Recent own commits via gh. Needs gh auth + github_login/git_emails.",
+    "sources.podcasts": "true/false. YouTube podcast synthesis. Needs shows.json + claude + yt-dlp.",
+    "sources.youtube_likes": "true/false. Long-form liked videos. Needs YouTube session + claude + yt-dlp."
+  },
   "identity": {
     "name": "Your Name",
     "context": "what you do in one line, used to personalize pre-engagement briefs (e.g. early-stage VC focused on AI infra)",

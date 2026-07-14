@@ -6,22 +6,36 @@ updated: 2026-07-14
 
 # Setup: bootstrap your second brain
 
-Checklist for a human **or** an AI agent pointed at this repo. Complete steps
-in order. Prefer `scripts/doctor.sh` after bootstrap to verify.
+**Single path** for a human or any AI agent (Claude Code, Codex, Grok, GLM,
+Claudian, etc.). Complete steps in order. After bootstrap, run
+`scripts/doctor.sh` and fix every FAIL for sources you left enabled.
 
-## For agents
+Also read: [[TOOLS]] (Obsidian, Claudian, Web Clipper, scrapers, how to add
+sources), [[AGENTS]] (vault contract), `config.example.json` (`_fields` docs).
 
-You are standing up a personal vault, not answering a query. You **may**:
+## For agents (authorization)
 
-- write `config.json` from the operator's answers
-- create/edit seed notes under `Profile/`
-- write secret files only under the configured `secrets_dir` (never in the vault)
-- edit `scripts/podcasts/shows.json`
-- run `scripts/bootstrap.sh`, `scripts/doctor.sh`, and auth commands
-- install launchd after rewriting the vault path
+You are standing up a personal vault, not answering a one-shot query.
 
-You **must not** commit secrets, push unless the operator says so, or invent
-handles/IDs. Interview the operator for missing values.
+**You may:**
+
+1. Interview the operator for identity, handles, which sources they use, browser.
+2. Write `config.json` from answers (copy from `config.example.json` first via bootstrap).
+3. Create/edit seed notes under `Profile/` (overview, identity, working-with-me).
+4. Write secret files **only** under the configured `secrets_dir` (never in the vault).
+5. Edit `scripts/podcasts/shows.json` to match shows they follow.
+6. Run `scripts/bootstrap.sh`, `scripts/doctor.sh`, auth commands (`xtap`, `gh`).
+7. Install the launchd plist after bootstrap rewrote the vault path.
+8. Recommend Obsidian + Claudian + Web Clipper from TOOLS.md.
+
+**You must not:**
+
+- Invent API keys, RSS keys, passwords, or cookies.
+- Commit or push secrets, or push the vault, unless the operator explicitly says to push.
+- Enable a source you cannot auth; set `sources.<key>` to `false` instead.
+- Skip doctor when finishing a setup session.
+
+If a value is missing, **ask**. Placeholders in `config.example.json` are not real identity.
 
 ## Prerequisites
 
@@ -30,10 +44,14 @@ handles/IDs. Interview the operator for missing values.
 | Python 3 | venv, ingest scripts, xtap |
 | `claude` CLI on PATH | daily filing, podcast/likes synth, ledgers, briefs, ask |
 | `grok` CLI (optional) | `ask.sh -m grok` |
-| `gh` CLI, authenticated | GitHub source |
-| Browser with logged-in X session | xtap bookmarks + YouTube likes cookies |
+| `gh` CLI, authenticated | GitHub source (if enabled) |
+| Browser with logged-in X session | xtap bookmarks (+ YouTube for likes) |
 | macOS (for launchd) or cron | daily job |
-| Obsidian (optional) | browse/edit the vault |
+| **Obsidian** | browse/edit the vault (recommended) |
+| **Claudian** (Obsidian plugin) | in-vault Claude agent (recommended) |
+| **Obsidian Web Clipper** | capture pages into `Clippings/` (recommended) |
+
+Details and install notes: [[TOOLS]].
 
 ## Step 1. Clone and bootstrap
 
@@ -43,30 +61,32 @@ cd second-brain
 bash scripts/bootstrap.sh
 ```
 
-This creates `config.json`, folder structure (`Profile/`, `Projects/`, `Log/`,
-Sources, …), Python venv, installs `xtap` + deps, seeds Profile stubs, writes
-`todos.md` if missing, creates the secrets dir, and rewrites the launchd plist
-path to this clone.
+Creates `config.json`, folders (`Profile/`, `Projects/`, `Log/`, Sources, …),
+venv, installs xtap + deps, seeds Profile stubs, `todos.md`, secrets dir, and
+rewrites `scripts/com.brain.ingest.plist` to this clone path.
 
 ## Step 2. Fill `config.json`
 
-Edit every field. See `config.example.json`.
+Edit every live field. **Documentation for each field** lives in
+`config.example.json` under `_fields` (agents: read `_fields` then write real
+keys). Underscore keys are ignored by `scripts/config.py`.
 
 | Field | Notes |
 |-------|--------|
-| `identity.name` | Display name injected into AI prompts |
-| `identity.context` | One line for briefs (role, focus) |
-| `identity.interests` | Short tags; also seed Profile |
-| `identity.git_emails` | Used to attribute GitHub commits |
-| `identity.github_login` | GitHub username |
-| `identity.goodreads_user_id` | Numeric id from Goodreads profile URL |
-| `identity.substack_feed` | Full RSS URL, or leave placeholder and disable source |
-| `browser` | `brave`, `chrome`, `firefox`, … (xtap cookie import) |
-| `secrets_dir` | Outside the vault, e.g. `~/Developer/helpers` |
-| `podcasts.cutoff` | `YYYYMMDD` backfill floor |
-| `sources.*` | `true`/`false` per pipeline |
+| `identity.name` | Display name in AI prompts. Required. |
+| `identity.context` | One line for briefs (role, focus). |
+| `identity.interests` | Short tags; expand in Profile. |
+| `identity.git_emails` | Own commits for github source. |
+| `identity.github_login` | GitHub username. |
+| `identity.goodreads_user_id` | Numeric id; only if Goodreads on. |
+| `identity.substack_feed` | Full RSS URL; only if Substack on. |
+| `browser` | `brave`, `chrome`, `firefox`, … for xtap. |
+| `secrets_dir` | Outside vault, e.g. `~/Developer/helpers`. |
+| `podcasts.cutoff` | `YYYYMMDD` backfill floor. |
+| `sources.*` | `true`/`false` per pipeline (see TOOLS.md). |
 
-Disable sources you will not configure (`sources.goodreads: false`, etc.).
+Disable sources you will not configure. Every `sources.*` key is honored by
+`scripts/ingest-daily.sh`.
 
 ## Step 3. Secrets
 
@@ -75,36 +95,38 @@ Never put secrets in the vault or `config.json`. Layout under `secrets_dir`:
 ```
 $secrets_dir/
   goodreads/
-    rss-key          # single line: private RSS key from Goodreads
+    rss-key          # single line; only if sources.goodreads is true
 ```
 
-How to get the Goodreads key: Goodreads -> Account settings -> RSS (private
-"all shelves" or per-shelf feed URL contains `key=`). Put only the key value
-in `rss-key`.
-
-X auth uses browser cookies via xtap (step 4), not a file in secrets_dir.
-
-See also `secrets.example/README.md`.
+How to get the Goodreads key: account settings → RSS URL contains `key=`.
+Put only the key value in `rss-key`. X auth uses browser cookies via xtap
+(step 4), not a file here. See `secrets.example/README.md`.
 
 ## Step 4. Auth external accounts
 
 ```bash
-# X / Twitter session for bookmarks
-.venv/bin/xtap auth browser --browser "$(python3 scripts/config.py browser)"
+# X / Twitter session for bookmarks (and often YouTube cookie jar ecosystem)
+.venv/bin/xtap auth browser --browser "$(.venv/bin/python3 scripts/config.py browser)"
 .venv/bin/xtap auth whoami
 
-# GitHub (for sources.github)
-gh auth status
+# GitHub (only if sources.github is true)
+gh auth status   # or: gh auth login
 ```
 
-## Step 5. Podcasts and Profile
+## Step 5. Podcasts, Profile, recommended apps
 
 ```bash
 $EDITOR scripts/podcasts/shows.json   # keep only shows you follow
 ```
 
-Fill the seed notes under `Profile/` (at least `00-overview.md` and
-`working-with-me.md`). Agents load these before non-trivial answers.
+Fill `Profile/00-overview.md` and `Profile/working-with-me.md` (agents load
+these first).
+
+Recommend the operator install (from TOOLS.md):
+
+1. **Obsidian** → Open vault = this repo folder.
+2. **Claudian** community plugin → chat against the same files.
+3. **Obsidian Web Clipper** → save targets to `Clippings/`.
 
 ## Step 6. Doctor
 
@@ -112,21 +134,17 @@ Fill the seed notes under `Profile/` (at least `00-overview.md` and
 bash scripts/doctor.sh
 ```
 
-Fix anything red. Yellow items are optional sources you disabled or soft deps.
+Critical FAILs for enabled sources must be fixed before relying on daily ingest.
+WARN is acceptable for optional CLIs or disabled sources.
 
 ## Step 7. Daily job (macOS)
 
 ```bash
-# bootstrap already rewrote the path inside scripts/com.brain.ingest.plist
 cp scripts/com.brain.ingest.plist ~/Library/LaunchAgents/
 launchctl load ~/Library/LaunchAgents/com.brain.ingest.plist
 ```
 
-Manual run:
-
-```bash
-bash scripts/ingest-daily.sh
-```
+Manual run: `bash scripts/ingest-daily.sh`
 
 Env overrides: `BRAIN_PROCESS=0`, `BRAIN_X_DELETE=0`, `BRAIN_PODCASTS=0`,
 `BRAIN_LIKES=0`.
@@ -140,22 +158,21 @@ scripts/ask.sh "what is in my Profile?"
 scripts/intelligence/brief.sh some-person-slug
 ```
 
-Open the vault folder in Obsidian.
+Open the vault in Obsidian.
 
 ## Success criteria
 
 | Horizon | Expect |
 |---------|--------|
-| Day 0 | `doctor.sh` clean for enabled sources; Profile stubs filled; ask works |
-| Day 1 | `ingest-daily` ran; Sources/ has captures or intentional skips; commit on remote if push path works |
-| Week 1 | Library/podcasts or likes notes if those sources on; first brief or ledger |
+| Day 0 | doctor clean for enabled sources; Profile filled; ask works; Obsidian opens vault |
+| Day 1 | ingest ran; Sources has captures or intentional skips |
+| Week 1 | Library notes if podcasts/likes on; first brief or ledger |
 
 ## Troubleshooting
 
-- **pull/push fails:** scripts use the **current branch** name. Stay on `master`
-  or `main` and ensure `origin` tracks it.
-- **Goodreads fails:** check `identity.goodreads_user_id` and
-  `$secrets_dir/goodreads/rss-key`.
+- **pull/push fails:** scripts use the **current branch**. Track `origin` for it.
+- **Goodreads fails:** `identity.goodreads_user_id` + `$secrets_dir/goodreads/rss-key`.
 - **X bookmarks empty:** re-run `xtap auth browser` while logged into X.
-- **No Claude processing:** install/login `claude` CLI; Sources still archive.
-- **launchd silent:** check `/tmp/brain.ingest.out.log` and `.err.log`.
+- **No Claude processing:** install/login `claude`; Sources still archive.
+- **launchd silent:** `/tmp/brain.ingest.out.log` and `.err.log`.
+- **Adding a source:** TOOLS.md → "How to add a new ingestor".

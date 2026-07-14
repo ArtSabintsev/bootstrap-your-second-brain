@@ -33,13 +33,13 @@ brain_git_push() {
 }
 
 # True if config.sources.<key> is enabled (default true when missing).
+# Delegates to scripts/config.py source_enabled so shell and Python agree.
 brain_source_enabled() {
   local key="$1"
   local v
-  v="$(brain_py "$ROOT/scripts/config.py" "sources.$key" 2>/dev/null || echo true)"
+  v="$(brain_py "$ROOT/scripts/config.py" --source-enabled "$key" 2>/dev/null || echo true)"
   case "$v" in
     true|True|TRUE|1|yes|Yes|YES) return 0 ;;
-    false|False|FALSE|0|no|No|NO|null|None|"") return 1 ;;
-    *) return 0 ;;
+    *) return 1 ;;
   esac
 }

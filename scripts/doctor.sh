@@ -68,13 +68,14 @@ fi
 
 echo
 echo "-- sources (from config) --"
-for key in x_bookmarks goodreads substack github podcasts youtube_likes; do
+while IFS= read -r key; do
+  [[ -z "$key" ]] && continue
   if brain_source_enabled "$key"; then
     printf '  ON   sources.%s\n' "$key"
   else
     printf '  OFF  sources.%s\n' "$key"
   fi
-done
+done < <(brain_py scripts/config.py --source-keys 2>/dev/null | brain_py -c 'import json,sys;print("\n".join(json.load(sys.stdin)))')
 
 echo
 echo "-- optional / source-specific --"

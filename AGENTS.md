@@ -15,8 +15,9 @@ and interests come from `config.json` (see Bootstrap / SETUP.md), never hardcode
 ## Structure
 
 ```
-README.md    <- Home / Map of Content
-SETUP.md     <- human + AI bootstrap walkthrough
+README.md    <- Home / Map of Content (Obsidian-friendly)
+SETUP.md     <- human + AI bootstrap walkthrough (setup intent)
+TOOLS.md     <- Obsidian / Claudian / Web Clipper + scrapers + how to extend
 Profile/     <- who the operator is: identity, work, beliefs, working-with-me
 Projects/    <- one note per thing the operator builds or runs
 Topics/      <- canonical concepts only (governed by scripts/ontology.yaml)
@@ -27,12 +28,16 @@ Briefs/      <- generated pre-engagement briefs (query answers, filed back)
 Log/         <- append-only dated operator journal (decisions, lessons, ideas)
 Sources/     <- IMMUTABLE raw inputs: capture archive, feed pulls, X bookmarks
 _indexes/    <- machine-readable graph (appearances.json), lint reports
-Clippings/   <- inbox: Web Clipper + Obsidian mobile write here
+Clippings/   <- inbox: Obsidian Web Clipper + mobile write here
 Drafts/      <- the operator's own writing in progress (posts, essays)
-tools/       <- vendored code the automation runs (xtap: X archive/search/RAG)
+tools/       <- vendored code (e.g. xtap); install into .venv; state outside vault
 scripts/     <- automation entry points; scripts/intelligence/ is the brain layer
 todos.md     <- open actions
 ```
+
+Folder names are Title Case so humans can browse them in Obsidian. Filenames
+are kebab-case. Notes use YAML frontmatter + `[[wikilinks]]` so agents and
+Obsidian share one graph.
 
 ## Session bootstrap (load before you answer)
 
@@ -52,11 +57,21 @@ slug) can skip the full Profile pass, but still follow standing voice rules.
 
 ## If asked to bootstrap this repo
 
-Follow `SETUP.md` end to end. You may write `config.json`, seed `Profile/`,
-place secret files under the configured `secrets_dir` (never in the vault),
-edit `scripts/podcasts/shows.json`, run `scripts/bootstrap.sh` and
-`scripts/doctor.sh`, and install the launchd job after path rewrite. Do not
-push unless the operator says to.
+This is a first-class intent for Claude Code, Codex, Grok, GLM-class agents,
+and Claudian. Follow **SETUP.md** end to end; use **TOOLS.md** for app and
+scraper recommendations.
+
+You **may**: write `config.json` (field docs in `config.example.json` `_fields`),
+seed `Profile/`, place secret files only under `secrets_dir`, edit
+`scripts/podcasts/shows.json`, run `scripts/bootstrap.sh` and
+`scripts/doctor.sh`, install launchd after path rewrite.
+
+You **must**: interview for handles/IDs; disable sources the operator will not
+configure; stop and ask for secrets rather than inventing them; run doctor and
+fix FAILs for enabled sources.
+
+You **must not**: commit secrets into the vault, invent credentials, or push
+unless the operator explicitly says to push.
 
 ## Intelligence layer (not an archive)
 
