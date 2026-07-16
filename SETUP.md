@@ -143,7 +143,9 @@ bash scripts/doctor.sh
 ```
 
 Critical FAILs for enabled sources must be fixed before relying on daily ingest.
-WARN is acceptable for optional CLIs or disabled sources.
+WARN is acceptable for optional CLIs or disabled sources. The `claude` CLI is
+checked in the critical section: without it the nightly filing and synthesis
+passes cannot run (archiving still works).
 
 ## Step 7. Daily job (macOS)
 

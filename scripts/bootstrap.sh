@@ -35,17 +35,21 @@ source "$ROOT/scripts/lib.sh"
 # 4. secrets dir (never inside the vault)
 SECRETS="$(brain_py scripts/config.py secrets_dir)"
 SECRETS="${SECRETS/#\~/$HOME}"
-mkdir -p "$SECRETS/goodreads"
+mkdir -p "$SECRETS"
+if [[ "$(brain_py scripts/config.py --source-enabled goodreads)" == "true" ]]; then
+  mkdir -p "$SECRETS/goodreads"
+fi
 BROWSER="$(brain_py scripts/config.py browser)"
 NAME="$(brain_py scripts/config.py identity.name 2>/dev/null || echo 'Your Name')"
 CONTEXT="$(brain_py scripts/config.py identity.context 2>/dev/null || echo '')"
 TODAY="$(date +%Y-%m-%d)"
 
-# 5. Profile seeds (only if missing; never overwrite operator edits)
+# 5. Profile seeds. Write when the file is missing OR still the shipped
+# placeholder stub ("Replace this stub"); never overwrite operator edits.
 seed_profile() {
   local path="$1"
   local content="$2"
-  if [[ ! -f "$path" ]]; then
+  if [[ ! -f "$path" ]] || grep -q "Replace this stub" "$path" 2>/dev/null; then
     printf '%s\n' "$content" > "$path"
     echo "seeded $path"
   fi
