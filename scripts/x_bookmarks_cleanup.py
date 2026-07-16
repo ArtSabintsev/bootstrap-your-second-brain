@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
-"""Remove bookmarks from X once they are safely archived in the vault.
+"""Clear the X bookmark queue once the daily capture has run.
 
-For every tweet in the newest bookmarks snapshot, verify its status ID appears
-in a capture under Sources/x-bookmarks/, then call DeleteBookmark for it.
-Anything not yet archived is left untouched. This only removes bookmarks; it
-never deletes tweets, likes, or follows.
+Default: delete every bookmark in the newest snapshot (the queue is treated
+as an inbox; capture archives it, cleanup empties it). With --only-archived,
+delete only bookmarks whose status ID is verified in a capture under
+Sources/x-bookmarks/ (the old conservative behavior). This only removes
+bookmarks; it never deletes tweets, likes, or follows.
 
-Usage: x_bookmarks_cleanup.py [--dry-run]
+Usage: x_bookmarks_cleanup.py [--dry-run] [--only-archived]
 """
 
 from __future__ import annotations
@@ -41,14 +42,16 @@ def snapshot_ids() -> list[str]:
     return [json.loads(line)["id"] for line in snaps[-1].read_text().splitlines()]
 
 
-async def cleanup(dry_run: bool) -> None:
-    archived = archived_ids()
+async def cleanup(dry_run: bool, only_archived: bool = False) -> None:
     current = snapshot_ids()
-    deletable = [i for i in current if i in archived]
-    skipped = len(current) - len(deletable)
-
-    if skipped:
-        print(f"skipping {skipped} bookmark(s) not yet archived")
+    if only_archived:
+        archived = archived_ids()
+        deletable = [i for i in current if i in archived]
+        skipped = len(current) - len(deletable)
+        if skipped:
+            print(f"skipping {skipped} bookmark(s) not yet archived")
+    else:
+        deletable = list(current)
     if not deletable:
         print("nothing to delete")
         return
@@ -69,4 +72,4 @@ async def cleanup(dry_run: bool) -> None:
 
 
 if __name__ == "__main__":
-    asyncio.run(cleanup(dry_run="--dry-run" in sys.argv))
+    asyncio.run(cleanup(dry_run="--dry-run" in sys.argv, only_archived="--only-archived" in sys.argv))

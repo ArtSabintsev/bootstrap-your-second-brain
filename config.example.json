@@ -11,6 +11,8 @@
     "browser": "Browser for xtap AND yt-dlp cookies (podcasts, youtube_likes): brave, chrome, chromium, firefox, edge, safari.",
     "secrets_dir": "Absolute or ~ path outside the vault for secret files. Default ~/Developer/helpers.",
     "models.process": "Nightly filing model chain, best first. List of 'claude:<model-id>', 'grok[:<model-id>]', or a bare model id (implies claude). The pass slides down the list to the first CLI that is installed and succeeds. A single string still works.",
+    "schedule.ingest_hour": "Local hour (0-23) the daily launchd ingest fires. Default 5. bootstrap.sh writes it into the plist.",
+    "schedule.ingest_minute": "Minute (0-59) for the daily ingest. Default 0.",
     "podcasts.cutoff": "YYYYMMDD floor for podcast backfill (episodes older than this are skipped).",
     "sources.x_bookmarks": "true/false. X bookmarks via vendored xtap. Needs browser login + xtap auth.",
     "sources.goodreads": "true/false. Goodreads RSS. Needs goodreads_user_id + secrets_dir/goodreads/rss-key.",
@@ -37,6 +39,10 @@
       "grok",
       "claude:claude-sonnet-5"
     ]
+  },
+  "schedule": {
+    "ingest_hour": 5,
+    "ingest_minute": 0
   },
   "podcasts": {
     "cutoff": "20221128"

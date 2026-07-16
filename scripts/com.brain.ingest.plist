@@ -5,7 +5,8 @@
   Substack, GitHub, podcasts, YouTube likes). Read-only against the external
   accounts except optional X-bookmark cleanup after successful processing.
 
-  scripts/bootstrap.sh rewrites the ProgramArguments path to your clone.
+  scripts/bootstrap.sh rewrites the ProgramArguments path to your clone
+  and sets the run time from config schedule.ingest_hour / ingest_minute.
   Default below assumes ~/Developer/second-brain.
 
   Install:
@@ -27,7 +28,7 @@
   <key>StartCalendarInterval</key>
   <dict>
     <key>Hour</key>
-    <integer>8</integer>
+    <integer>5</integer>
     <key>Minute</key>
     <integer>0</integer>
   </dict>

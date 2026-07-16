@@ -205,11 +205,24 @@ text2, n = re.subn(
     count=1,
     flags=re.DOTALL,
 )
-if n:
-    p.write_text(text2)
-    print("rewrote launchd path ->", new)
-else:
+if not n:
+    text2 = text
     print("launchd plist path left unchanged (edit scripts/com.brain.ingest.plist manually)")
+else:
+    print("rewrote launchd path ->", new)
+
+# Run time from config (schedule.ingest_hour / ingest_minute, default 05:00)
+import sys
+sys.path.insert(0, str(Path(root) / "scripts"))
+import config as _cfg
+hour = int(_cfg.get("schedule.ingest_hour", 5) or 5)
+minute = int(_cfg.get("schedule.ingest_minute", 0) or 0)
+text2 = re.sub(r"<key>Hour</key>\s*<integer>\d+</integer>",
+               f"<key>Hour</key>\n    <integer>{hour}</integer>", text2)
+text2 = re.sub(r"<key>Minute</key>\s*<integer>\d+</integer>",
+               f"<key>Minute</key>\n    <integer>{minute}</integer>", text2)
+p.write_text(text2)
+print(f"launchd schedule -> {hour:02d}:{minute:02d}")
 PY
 fi
 
