@@ -78,7 +78,7 @@ if [[ -z "$(git status --porcelain Sources/)" ]]; then
 else
   PROCESS_OK=0
   if [[ "${BRAIN_PROCESS:-1}" == "1" ]]; then
-    PROCESS_PROMPT="New captures were just appended under Sources/ (x-bookmarks, goodreads, substack, and/or github; see 'git status Sources/'). Follow AGENTS.md. For each substantive new item: enrich, analyze, then file. Enrich: follow the item's links with WebFetch (t.co redirects, linked articles, threads) and read what the source actually says, not just the capture text; use WebSearch when a claim needs context or verification. Analyze: go beyond summary — what does this signal for the market or space it belongs to, what are the second-order effects, and how does it connect to $OPERATOR's existing theses and notes (example: a bookmark about Starbucks dropping Microsoft/IBM for bespoke software isn't 'Starbucks news', it's a data point about AI collapsing the cost of internal software and what that does to enterprise vendors — capture that inference). For the github capture, fold the recent commits into the relevant Projects/ notes so the vault tracks what $OPERATOR is actively building (what shipped, what changed, current state); do not make a note per commit. File other items into Topics/, Library/, or People/ with proper frontmatter, tags from the approved tag list, wikilinks to related notes, and the source URL. Leave throwaway items (memes, one-liners with no substance) unfiled. Append one line per filed item to .status/filed.log in the form 'YYYY-MM-DD <capture item> -> <note path>'. Do not edit anything under Sources/. Do not commit or push; the calling script does."
+    PROCESS_PROMPT="New captures were just appended under Sources/ (x-bookmarks, goodreads, substack, and/or github; see 'git status Sources/'). Follow AGENTS.md. For each substantive new item: enrich, analyze, then file. Enrich: follow the item's links with WebFetch (t.co redirects, linked articles, threads) and read what the source actually says, not just the capture text; use WebSearch when a claim needs context or verification. Analyze: go beyond summary — what does this signal for the market or space it belongs to, what are the second-order effects, and how does it connect to $OPERATOR's existing theses and notes (example: a bookmark about Starbucks dropping Microsoft/IBM for bespoke software isn't 'Starbucks news', it's a data point about AI collapsing the cost of internal software and what that does to enterprise vendors — capture that inference). For the github capture, fold the recent commits into the relevant Projects/ notes so the vault tracks what $OPERATOR is actively building (what shipped, what changed, current state); do not make a note per commit. File other items into Topics/, Library/, or People/ with proper frontmatter, tags from the approved tag list, wikilinks to related notes, and the source URL. Leave throwaway items (memes, one-liners with no substance) unfiled. Evolve the intelligence layer as you file: when a capture contains a substantive dated claim by someone with a People/ note, append a dated row (stance, claim, cite) to that person's position ledger and adjust the arc line; when a capture bears on a thesis in Theses/, append a dated timeline entry there, or add it to the counter-evidence queue if it cuts against. Never rewrite prior ledger or timeline rows. Append one line per filed item to .status/filed.log in the form 'YYYY-MM-DD <capture item> -> <note path>'. Do not edit anything under Sources/. Do not commit or push; the calling script does."
     # Sliding scale: walk config models.process (best model first) until one
     # CLI/model pair is installed and succeeds. See scripts/config.py.
     while IFS=$'\t' read -r RUNNER MODEL; do
@@ -112,6 +112,12 @@ else
 
   git add -A Sources Topics Library People Projects Profile
   git commit -m "Daily ingest $(date +%Y-%m-%d)" --quiet || log "nothing to commit"
+
+  log "digest: writing Digests/$(date +%Y-%m-%d).md"
+  brain_py "$ROOT/scripts/digest.py" || log "WARN: digest failed"
+  if [[ -n "$(git status --porcelain Digests/)" ]]; then
+    git add Digests && git commit -m "Digest $(date +%Y-%m-%d)" --quiet || true
+  fi
 fi
 
 if [[ "${BRAIN_X_DELETE:-1}" == "1" && "$PROCESS_OK" == "1" ]] && brain_source_enabled x_bookmarks; then

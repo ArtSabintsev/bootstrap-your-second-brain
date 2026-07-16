@@ -25,6 +25,7 @@ People/      <- one note per person; core people carry a position ledger
 Theses/      <- the operator's own evolving positions, dated, with counter-evidence
 Library/     <- processed reading and references (incl. podcasts/, youtube-likes/)
 Briefs/      <- generated pre-engagement briefs (query answers, filed back)
+Digests/     <- generated morning digests: what got filed, added, updated each day
 Log/         <- append-only dated operator journal (decisions, lessons, ideas)
 Sources/     <- IMMUTABLE raw inputs: capture archive, feed pulls, X bookmarks
 _indexes/    <- machine-readable graph (appearances.json), lint reports
