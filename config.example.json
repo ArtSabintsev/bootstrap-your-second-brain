@@ -18,7 +18,7 @@
     "sources.goodreads": "true/false. Goodreads RSS. Needs goodreads_user_id + secrets_dir/goodreads/rss-key.",
     "sources.substack": "true/false. Substack publication archive. Needs identity.substack_feed.",
     "sources.github": "true/false. Recent own commits via gh. Needs gh auth + github_login/git_emails.",
-    "sources.podcasts": "true/false. YouTube podcast synthesis. Needs shows.json + claude + yt-dlp.",
+    "sources.podcasts": "true/false. Podcast synthesis. Needs claude + yt-dlp, and scripts/podcasts/shows.json filled with YOUR shows (ships empty; schema in shows.example.json). Typical types: an interview/ideas show you want deep per-episode notes from (YouTube channel URL), and a short daily-news show as a world-context digest (RSS + role: world-context).",
     "sources.youtube_likes": "true/false. Long-form liked videos. Needs YouTube session + claude + yt-dlp.",
     "sources.google_drive_meetings": "true/false. Google Meet's auto-generated 'Notes by Gemini' docs, filed into Meetings/<project>.md. Needs a one-time OAuth setup: scripts/google_drive_auth.py. Off by default."
   },
