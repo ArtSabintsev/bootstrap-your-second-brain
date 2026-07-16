@@ -79,8 +79,8 @@ config. Do not invent secrets. Do not push unless I say so."*
 ## The deck
 
 A presentation of the whole system, built from a live vault:
-[docs/deck/bootstrapping-your-second-brain.html](docs/deck/bootstrapping-your-second-brain.html)
-(markdown source alongside it).
+[view it rendered](https://artsabintsev.github.io/bootstrap-your-second-brain/deck/bootstrapping-your-second-brain.html)
+([source](docs/deck/bootstrapping-your-second-brain.md)).
 
 ## Day-to-day
 
