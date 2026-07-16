@@ -87,6 +87,8 @@ keys). Underscore keys are ignored by `scripts/config.py`.
 | `secrets_dir` | Outside vault, e.g. `~/Developer/helpers`. |
 | `podcasts.cutoff` | `YYYYMMDD` backfill floor. |
 | `sources.*` | `true`/`false` per pipeline (see TOOLS.md). |
+| `models.process` | Nightly filing model chain, best first (`claude:<id>`, `grok`, or bare id). The job slides down to the first CLI that is installed and succeeds. |
+| `schedule.ingest_hour` / `ingest_minute` | When the daily launchd job fires (default 05:00). bootstrap.sh writes it into the plist. |
 
 Disable sources you will not configure. Every `sources.*` key is honored by
 `scripts/ingest-daily.sh`.
@@ -99,6 +101,9 @@ Never put secrets in the vault or `config.json`. Layout under `secrets_dir`:
 $secrets_dir/
   goodreads/
     rss-key          # single line; only if sources.goodreads is true
+  google/
+    drive-token.json # written by scripts/google_drive_auth.py; only if
+                     # sources.google_drive_meetings is true
 ```
 
 How to get the Goodreads key: account settings → RSS URL contains `key=`.

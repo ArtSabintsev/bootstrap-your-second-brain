@@ -58,7 +58,9 @@ INTERFACE: ask.sh, log.sh, Obsidian, Claudian
 ```
 
 Built-in sources (each toggleable): X bookmarks (xtap), Goodreads, Substack,
-GitHub, podcasts, YouTube likes. How each works and how to add more: [[TOOLS]].
+GitHub, podcasts (incl. world-context digests), YouTube likes, Google Drive
+meeting notes. Each morning a digest lands in Digests/ with what got filed.
+How each works and how to add more: [[TOOLS]].
 
 ## Bootstrap (quick)
 

@@ -7,8 +7,9 @@
 #
 #   backfill.sh [show_key ...]      (default: all shows in shows.json)
 #
-# Env: CUTOFF=YYYYMMDD (default ChatGPT week), JOBS=N parallel workers (default 5),
-#      BRAIN_POD_MODEL (default claude-sonnet-5), COMMIT_EVERY=N batches (default 1).
+# Env: CUTOFF=YYYYMMDD (default: config podcasts.cutoff, else ChatGPT week),
+#      JOBS=N parallel workers (default 2), BRAIN_POD_MODEL (default claude-sonnet-5),
+#      COMMIT_EVERY=N batches (default 1).
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
@@ -22,7 +23,9 @@ if ! mkdir "$LOCK" 2>/dev/null; then
 fi
 trap 'rmdir "$LOCK" 2>/dev/null' EXIT INT TERM
 
-export CUTOFF="${CUTOFF:-20221128}"        # week of the ChatGPT launch (2022-11-30)
+# Default cutoff: config.json podcasts.cutoff, else the week ChatGPT launched.
+_CFG_CUTOFF="$("$ROOT/.venv/bin/python3" -c "import sys; sys.path.insert(0,'$ROOT/scripts'); from config import get; print(get('podcasts.cutoff') or '')" 2>/dev/null || true)"
+export CUTOFF="${CUTOFF:-${_CFG_CUTOFF:-20221128}}"
 export BRAIN_POD_MODEL="${BRAIN_POD_MODEL:-claude-sonnet-5}"
 # YouTube rate-limits by account, so throughput is requests/hour, not
 # concurrency. Keep parallelism low and pace batches to stay under the limit.

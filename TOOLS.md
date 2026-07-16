@@ -99,11 +99,11 @@ orchestrator is `scripts/ingest-daily.sh`. Disabled sources are skipped cleanly.
 | | |
 |--|--|
 | **Scripts** | `scripts/podcasts/backfill.sh`, `fetch_transcript.py`, `synth_episode.sh`, `build_links.py` |
-| **Config** | `scripts/podcasts/shows.json` (show keys, YouTube URLs, tags) |
+| **Config** | `scripts/podcasts/shows.json` (show keys, YouTube or RSS URLs, tags, optional `source`/`role`) |
 | **Auth** | YouTube access via yt-dlp (rate-limited; shares lock with likes) |
 | **Input** | Episode list + auto-captions |
-| **Output** | Deep notes under `Library/podcasts/<show>/`; graph index via build_links |
-| **Deps** | yt-dlp (cookies via `config.browser`), claude CLI for synthesis, shows.json |
+| **Output** | Deep notes under `Library/podcasts/<show>/` for interest shows; **world-context** shows write monthly digests only (`consolidate_world_context.py`), not one note per episode |
+| **Deps** | yt-dlp (cookies via `config.browser`) for YouTube shows; RSS fetch for `source:rss` shows; claude CLI for deep synth |
 
 ### 6. YouTube likes (`sources.youtube_likes`)
 
@@ -115,6 +115,16 @@ orchestrator is `scripts/ingest-daily.sh`. Disabled sources are skipped cleanly.
 | **Output** | Substantive long-form notes under `Library/youtube-likes/`; skip log in `.status/` |
 | **Deps** | yt-dlp (cookies via `config.browser`), claude CLI (judges music/gameplay out) |
 
+### 7. Google Drive meetings (`sources.google_drive_meetings`)
+
+| | |
+|--|--|
+| **Scripts** | `scripts/google_drive_meetings_ingest.py`; one-time OAuth via `scripts/google_drive_auth.py` |
+| **Auth** | Google OAuth token in the `secrets_dir` (never in the vault) |
+| **Input** | Google Meet "Notes by Gemini" docs from Drive |
+| **Output** | `Sources/meeting-notes/…`; daily pass files into `Meetings/<project>.md` |
+| **Deps** | google-api-python-client, google-auth-oauthlib (installed by bootstrap) |
+
 ### After capture: filing and intelligence
 
 | Step | Script | Notes |
@@ -123,6 +133,7 @@ orchestrator is `scripts/ingest-daily.sh`. Disabled sources are skipped cleanly.
 | Graph index | `scripts/podcasts/build_links.py` | People/topics → episodes JSON under `_indexes/` |
 | Position ledger | `scripts/intelligence/build_ledger.sh <slug>` | On demand for core people |
 | Brief | `scripts/intelligence/brief.sh <slug>` | Pre-engagement read |
+| Morning digest | `scripts/digest.py` | Writes `Digests/<date>.md`: what got filed, added, updated |
 | Ask | `scripts/ask.sh` | Query with citations |
 | Log | `scripts/log.sh` | Operator journal |
 

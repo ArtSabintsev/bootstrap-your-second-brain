@@ -17,6 +17,7 @@ fi
 for d in Sources Topics People Theses Library Briefs Log Drafts Clippings \
          Profile Projects _indexes \
          Sources/x-bookmarks Sources/goodreads Sources/substack Sources/github \
+         Sources/meeting-notes Meetings Digests \
          Library/podcasts Library/youtube-likes; do
   mkdir -p "$d"
   # keep empty dirs in git when cloning without seeds
@@ -26,7 +27,7 @@ done
 # 3. venv + deps + vendored X CLI (xtap)
 [[ -d .venv ]] || python3 -m venv .venv
 .venv/bin/pip install -q -e tools/xtap
-.venv/bin/pip install -q httpx html2text openpyxl pypdf yt-dlp
+.venv/bin/pip install -q httpx html2text openpyxl pypdf yt-dlp google-api-python-client google-auth-oauthlib
 
 # shellcheck source=lib.sh
 source "$ROOT/scripts/lib.sh"

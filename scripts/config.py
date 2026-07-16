@@ -26,6 +26,7 @@ SOURCE_KEYS = (
     "github",
     "podcasts",
     "youtube_likes",
+    "google_drive_meetings",
 )
 
 

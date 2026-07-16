@@ -13,13 +13,14 @@
     "models.process": "Nightly filing model chain, best first. List of 'claude:<model-id>', 'grok[:<model-id>]', or a bare model id (implies claude). The pass slides down the list to the first CLI that is installed and succeeds. A single string still works.",
     "schedule.ingest_hour": "Local hour (0-23) the daily launchd ingest fires. Default 5. bootstrap.sh writes it into the plist.",
     "schedule.ingest_minute": "Minute (0-59) for the daily ingest. Default 0.",
-    "podcasts.cutoff": "YYYYMMDD floor for podcast backfill (episodes older than this are skipped).",
+    "podcasts.cutoff": "YYYYMMDD floor for podcast backfill (episodes older than this are skipped). E.g. 20220224 (Ukraine invasion week) for a world-events floor, or 20221128 (ChatGPT week) for a shorter AI-era backfill.",
     "sources.x_bookmarks": "true/false. X bookmarks via vendored xtap. Needs browser login + xtap auth.",
     "sources.goodreads": "true/false. Goodreads RSS. Needs goodreads_user_id + secrets_dir/goodreads/rss-key.",
     "sources.substack": "true/false. Substack publication archive. Needs identity.substack_feed.",
     "sources.github": "true/false. Recent own commits via gh. Needs gh auth + github_login/git_emails.",
     "sources.podcasts": "true/false. YouTube podcast synthesis. Needs shows.json + claude + yt-dlp.",
-    "sources.youtube_likes": "true/false. Long-form liked videos. Needs YouTube session + claude + yt-dlp."
+    "sources.youtube_likes": "true/false. Long-form liked videos. Needs YouTube session + claude + yt-dlp.",
+    "sources.google_drive_meetings": "true/false. Google Meet's auto-generated 'Notes by Gemini' docs, filed into Meetings/<project>.md. Needs a one-time OAuth setup: scripts/google_drive_auth.py. Off by default."
   },
   "identity": {
     "name": "Your Name",
@@ -53,6 +54,7 @@
     "substack": true,
     "github": true,
     "podcasts": true,
-    "youtube_likes": true
+    "youtube_likes": true,
+    "google_drive_meetings": false
   }
 }

@@ -20,6 +20,8 @@ SETUP.md     <- human + AI bootstrap walkthrough (setup intent)
 TOOLS.md     <- Obsidian / Claudian / Web Clipper + scrapers + how to extend
 Profile/     <- who the operator is: identity, work, beliefs, working-with-me
 Projects/    <- one note per thing the operator builds or runs
+Meetings/    <- one note per project/counterparty; dated meeting-notes log,
+                newest entry on top; cross-links back to the Projects/ note
 Topics/      <- canonical concepts only (governed by scripts/ontology.yaml)
 People/      <- one note per person; core people carry a position ledger
 Theses/      <- the operator's own evolving positions, dated, with counter-evidence
@@ -156,13 +158,18 @@ external accounts except optional X-bookmark cleanup after successful process.
 - **GitHub** - the operator's own recent commits via the `gh` CLI ->
   `Sources/github/`; the daily pass folds these into `Projects/` so the vault
   tracks what is actively being built
+- **Google Drive meetings** - Google Meet's "Notes by Gemini" docs ->
+  `Sources/meeting-notes/`; the daily pass files them into `Meetings/<project>.md`
+  (one-time OAuth via `scripts/google_drive_auth.py`; off by default)
 - **Podcasts** - YouTube auto-captions for the shows in
   `scripts/podcasts/shows.json`. Each episode gets a deep-synthesis note under
   `Library/podcasts/<show>/`; recurring guests become `People/` notes and
   recurring themes become threaded `Topics/` notes. Notes-only: transcripts are
   cleaned in a tmp dir and discarded, never committed. Ads and sponsor reads are
   stripped at synthesis. `scripts/podcasts/backfill.sh` does the one-time
-  backlog; the daily job picks up new episodes.
+  backlog; the daily job picks up new episodes. Shows marked
+  `role: world-context` in `shows.json` (e.g. a daily news podcast) get lean
+  monthly digests via `consolidate_world_context.py` instead of per-episode notes.
 - **YouTube likes** - the Liked-videos playlist is pulled live each run (no
   stored catalog; the synthesized notes plus `.status/youtube-likes-skip.log`
   are the watermark). Only substantive long-form videos get a
