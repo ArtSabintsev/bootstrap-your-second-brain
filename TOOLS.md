@@ -56,7 +56,7 @@ orchestrator is `scripts/ingest-daily.sh`. Disabled sources are skipped cleanly.
 
 | | |
 |--|--|
-| **Script** | `scripts/sources/x-bookmarks.sh` → `x_bookmarks_ingest.py` |
+| **Script** | `scripts/sources/x-bookmarks.sh` → `scripts/x_bookmarks_ingest.py` |
 | **Tool** | Vendored `tools/xtap` (install: `pip install -e tools/xtap` in `.venv`) |
 | **Auth** | `.venv/bin/xtap auth browser --browser <config.browser>` → session in `~/.xtap/` |
 | **Input** | Your X bookmarks via logged-in session (not the paid X API) |

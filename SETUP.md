@@ -101,9 +101,10 @@ Never put secrets in the vault or `config.json`. Layout under `secrets_dir`:
 $secrets_dir/
   goodreads/
     rss-key          # single line; only if sources.goodreads is true
-  google/
-    drive-token.json # written by scripts/google_drive_auth.py; only if
-                     # sources.google_drive_meetings is true
+  google-drive/
+    client_secret.json  # OAuth client from Google Cloud console; only if
+                        # sources.google_drive_meetings is true
+    token.json          # written by scripts/google_drive_auth.py
 ```
 
 How to get the Goodreads key: account settings → RSS URL contains `key=`.

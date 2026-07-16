@@ -41,3 +41,10 @@ If you do not use Goodreads, set `sources.goodreads` to `false` and skip this fi
 - Never commit files from `secrets_dir`.
 - Never paste keys into notes under Sources/, Profile/, or Drafts/.
 - Reference secrets by path only when documenting setup.
+
+## google-drive/ (only if sources.google_drive_meetings is true)
+
+- `google-drive/client_secret.json` — OAuth client credentials JSON from the
+  Google Cloud console (Drive API, desktop app).
+- `google-drive/token.json` — refresh token; written by
+  `scripts/google_drive_auth.py` after the one-time browser authorization.

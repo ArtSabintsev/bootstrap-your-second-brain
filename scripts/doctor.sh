@@ -46,7 +46,7 @@ else
   fail "identity.name still placeholder; edit config.json"
 fi
 
-for d in Profile Projects Log Sources Topics People Theses Library Briefs Drafts Clippings _indexes; do
+for d in Profile Projects Meetings Log Sources Topics People Theses Library Briefs Digests Drafts Clippings _indexes; do
   if [[ -d "$d" ]]; then
     ok "dir $d/"
   else
@@ -116,6 +116,30 @@ if brain_source_enabled goodreads; then
   fi
 else
   warn "goodreads source off"
+fi
+
+if brain_source_enabled substack; then
+  FEED="$(brain_py scripts/config.py identity.substack_feed 2>/dev/null || true)"
+  if [[ -n "$FEED" && "$FEED" != *"yourhandle"* ]]; then
+    ok "substack_feed=$FEED"
+  else
+    fail "identity.substack_feed still placeholder (sources.substack is on)"
+  fi
+else
+  warn "substack source off"
+fi
+
+if brain_source_enabled google_drive_meetings; then
+  SECRETS="$(brain_py scripts/config.py secrets_dir 2>/dev/null || echo '')"
+  SECRETS="${SECRETS/#\~/$HOME}"
+  GTOKEN="$SECRETS/google-drive/token.json"
+  if [[ -f "$GTOKEN" && -s "$GTOKEN" ]]; then
+    ok "google-drive token at $GTOKEN"
+  else
+    fail "missing $GTOKEN (sources.google_drive_meetings is on; run scripts/google_drive_auth.py)"
+  fi
+else
+  warn "google_drive_meetings source off"
 fi
 
 if brain_source_enabled x_bookmarks || brain_source_enabled youtube_likes; then
