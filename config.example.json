@@ -10,7 +10,7 @@
     "identity.substack_feed": "Full publication RSS URL. Required only if sources.substack is true; otherwise set sources.substack false.",
     "browser": "Browser for xtap AND yt-dlp cookies (podcasts, youtube_likes): brave, chrome, chromium, firefox, edge, safari.",
     "secrets_dir": "Absolute or ~ path outside the vault for secret files. Default ~/Developer/helpers.",
-    "models.process": "Hint for model id used by some synth/ledger scripts via env defaults; CLIs may override.",
+    "models.process": "Nightly filing model chain, best first. List of 'claude:<model-id>', 'grok[:<model-id>]', or a bare model id (implies claude). The pass slides down the list to the first CLI that is installed and succeeds. A single string still works.",
     "podcasts.cutoff": "YYYYMMDD floor for podcast backfill (episodes older than this are skipped).",
     "sources.x_bookmarks": "true/false. X bookmarks via vendored xtap. Needs browser login + xtap auth.",
     "sources.goodreads": "true/false. Goodreads RSS. Needs goodreads_user_id + secrets_dir/goodreads/rss-key.",
@@ -31,7 +31,12 @@
   "browser": "brave",
   "secrets_dir": "~/Developer/helpers",
   "models": {
-    "process": "claude-sonnet-5"
+    "process": [
+      "claude:claude-fable-5",
+      "claude:claude-opus-4-8",
+      "grok",
+      "claude:claude-sonnet-5"
+    ]
   },
   "podcasts": {
     "cutoff": "20221128"

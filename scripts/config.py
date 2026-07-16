@@ -81,6 +81,43 @@ def ytdlp_cookie_args() -> list[str]:
     return ["--cookies-from-browser", browser()]
 
 
+# Nightly filing pass: model preference chain, best first. Each entry is
+# "claude:<model-id>", "grok[:<model-id>]", or a bare model id (implies claude).
+DEFAULT_PROCESS_CHAIN = [
+    "claude:claude-fable-5",
+    "claude:claude-opus-4-8",
+    "grok",
+    "claude:claude-sonnet-5",
+]
+
+
+def process_model_chain() -> list[tuple[str, str]]:
+    """Ordered (runner, model) preferences for the nightly filing pass.
+
+    config.models.process may be a list or a single string; unknown shapes
+    fall back to DEFAULT_PROCESS_CHAIN. Empty model means the CLI default.
+    """
+    raw = get("models.process", DEFAULT_PROCESS_CHAIN)
+    if isinstance(raw, str):
+        raw = [raw]
+    if not isinstance(raw, list) or not raw:
+        raw = DEFAULT_PROCESS_CHAIN
+    chain: list[tuple[str, str]] = []
+    for entry in raw:
+        e = str(entry).strip()
+        if not e:
+            continue
+        if ":" in e:
+            runner, model = e.split(":", 1)
+            runner, model = runner.strip().lower(), model.strip()
+        elif e.lower() in ("grok", "claude"):
+            runner, model = e.lower(), ""
+        else:
+            runner, model = "claude", e
+        chain.append((runner, model))
+    return chain or [("claude", "")]
+
+
 def source_enabled(key: str, default: bool = True) -> bool:
     """Whether config.sources.<key> is on. Missing key => default (True)."""
     val = get(f"sources.{key}", default)
@@ -111,6 +148,10 @@ if __name__ == "__main__":
         sys.exit(0)
     if args and args[0] == "--source-keys":
         print(json.dumps(list(SOURCE_KEYS)))
+        sys.exit(0)
+    if args and args[0] == "--process-chain":
+        for runner, model in process_model_chain():
+            print(f"{runner}\t{model}")
         sys.exit(0)
     if args and args[0] == "--is-placeholder":
         print("true" if is_placeholder_identity() else "false")

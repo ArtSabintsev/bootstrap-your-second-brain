@@ -77,12 +77,37 @@ if [[ -z "$(git status --porcelain Sources/)" ]]; then
   log "no new captures; nothing to commit"
 else
   PROCESS_OK=0
-  if [[ "${BRAIN_PROCESS:-1}" == "1" ]] && command -v claude >/dev/null 2>&1; then
-    log "processing new captures with claude"
-    claude -p "New captures were just appended under Sources/ (x-bookmarks, goodreads, substack, and/or github; see 'git status Sources/'). Follow AGENTS.md. For each substantive new item: enrich, analyze, then file. Enrich: follow the item's links with WebFetch (t.co redirects, linked articles, threads) and read what the source actually says, not just the capture text; use WebSearch when a claim needs context or verification. Analyze: go beyond summary — what does this signal for the market or space it belongs to, what are the second-order effects, and how does it connect to $OPERATOR's existing theses and notes (example: a bookmark about Starbucks dropping Microsoft/IBM for bespoke software isn't 'Starbucks news', it's a data point about AI collapsing the cost of internal software and what that does to enterprise vendors — capture that inference). For the github capture, fold the recent commits into the relevant Projects/ notes so the vault tracks what $OPERATOR is actively building (what shipped, what changed, current state); do not make a note per commit. File other items into Topics/, Library/, or People/ with proper frontmatter, tags from the approved tag list, wikilinks to related notes, and the source URL. Leave throwaway items (memes, one-liners with no substance) unfiled. Append one line per filed item to .status/filed.log in the form 'YYYY-MM-DD <capture item> -> <note path>'. Do not edit anything under Sources/. Do not commit or push; the calling script does." \
-      --permission-mode acceptEdits --allowedTools "Read Write Edit WebSearch WebFetch Bash" >> "$LOG_DIR/ingest-claude.log" 2>&1 \
-      && PROCESS_OK=1 \
-      || log "WARN: claude processing failed; captures are still archived"
+  if [[ "${BRAIN_PROCESS:-1}" == "1" ]]; then
+    PROCESS_PROMPT="New captures were just appended under Sources/ (x-bookmarks, goodreads, substack, and/or github; see 'git status Sources/'). Follow AGENTS.md. For each substantive new item: enrich, analyze, then file. Enrich: follow the item's links with WebFetch (t.co redirects, linked articles, threads) and read what the source actually says, not just the capture text; use WebSearch when a claim needs context or verification. Analyze: go beyond summary — what does this signal for the market or space it belongs to, what are the second-order effects, and how does it connect to $OPERATOR's existing theses and notes (example: a bookmark about Starbucks dropping Microsoft/IBM for bespoke software isn't 'Starbucks news', it's a data point about AI collapsing the cost of internal software and what that does to enterprise vendors — capture that inference). For the github capture, fold the recent commits into the relevant Projects/ notes so the vault tracks what $OPERATOR is actively building (what shipped, what changed, current state); do not make a note per commit. File other items into Topics/, Library/, or People/ with proper frontmatter, tags from the approved tag list, wikilinks to related notes, and the source URL. Leave throwaway items (memes, one-liners with no substance) unfiled. Append one line per filed item to .status/filed.log in the form 'YYYY-MM-DD <capture item> -> <note path>'. Do not edit anything under Sources/. Do not commit or push; the calling script does."
+    # Sliding scale: walk config models.process (best model first) until one
+    # CLI/model pair is installed and succeeds. See scripts/config.py.
+    while IFS=$'\t' read -r RUNNER MODEL; do
+      case "$RUNNER" in
+        claude)
+          command -v claude >/dev/null 2>&1 || { log "process: claude CLI missing; skipping ${MODEL:-claude-default}"; continue; }
+          log "processing new captures with claude ${MODEL:-default}"
+          if claude -p "$PROCESS_PROMPT" ${MODEL:+--model "$MODEL"} \
+            --permission-mode acceptEdits --allowedTools "Read Write Edit WebSearch WebFetch Bash" \
+            >> "$LOG_DIR/ingest-claude.log" 2>&1; then
+            PROCESS_OK=1; log "process: filed by claude ${MODEL:-default}"; break
+          fi
+          log "WARN: claude ${MODEL:-default} failed; sliding to next model"
+          ;;
+        grok)
+          command -v grok >/dev/null 2>&1 || { log "process: grok CLI missing; skipping"; continue; }
+          log "processing new captures with grok ${MODEL:-default}"
+          if grok -p "$PROCESS_PROMPT" ${MODEL:+--model "$MODEL"} \
+            >> "$LOG_DIR/ingest-grok.log" 2>&1; then
+            PROCESS_OK=1; log "process: filed by grok ${MODEL:-default}"; break
+          fi
+          log "WARN: grok ${MODEL:-default} failed; sliding to next model"
+          ;;
+        *)
+          log "WARN: unknown runner '$RUNNER' in models.process; skipping"
+          ;;
+      esac
+    done < <(brain_py "$ROOT/scripts/config.py" --process-chain)
+    [[ "$PROCESS_OK" == "1" ]] || log "WARN: processing failed on every configured model; captures are still archived"
   fi
 
   git add -A Sources Topics Library People Projects Profile
