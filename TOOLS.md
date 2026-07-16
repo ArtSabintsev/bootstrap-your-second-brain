@@ -99,7 +99,7 @@ orchestrator is `scripts/ingest-daily.sh`. Disabled sources are skipped cleanly.
 | | |
 |--|--|
 | **Scripts** | `scripts/podcasts/backfill.sh`, `fetch_transcript.py`, `synth_episode.sh`, `build_links.py` |
-| **Config** | `scripts/podcasts/shows.json` (show keys, YouTube or RSS URLs, tags, optional `source`/`role`) |
+| **Config** | `scripts/podcasts/shows.json` (starts empty; schema in `shows.example.json`: show keys, YouTube or RSS URLs, tags, optional `source`/`role`) |
 | **Auth** | YouTube access via yt-dlp (rate-limited; shares lock with likes) |
 | **Input** | Episode list + auto-captions |
 | **Output** | Deep notes under `Library/podcasts/<show>/` for interest shows; **world-context** shows write monthly digests only (`consolidate_world_context.py`), not one note per episode |

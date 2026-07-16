@@ -11,7 +11,7 @@ that feeds it, and the persistent memory agents load for context.
 
 | Operator says roughly… | You do… |
 |------------------------|---------|
-| "set up / bootstrap / configure my second brain" | Follow **SETUP.md** end to end. You may write `config.json`, seed `Profile/`, place secrets only under `secrets_dir`, edit `shows.json`, run `bootstrap.sh` + `doctor.sh`. Interview for handles and IDs. **Never invent secrets or push** unless the operator explicitly says to push. |
+| "set up / bootstrap / configure my second brain" | Follow **SETUP.md** end to end. You may write `config.json`, seed `Profile/`, place secrets only under `secrets_dir`, fill `shows.json` (interview for shows, find the URLs), run `bootstrap.sh` + `doctor.sh`. Interview for handles and IDs. **Never invent secrets or push** unless the operator explicitly says to push. |
 | "what should I install / which apps" | Recommend from **TOOLS.md**: Obsidian, Claudian, Web Clipper, CLIs. |
 | normal vault Q&A | Query is read-only; load Profile first on non-trivial work; cite `[[wikilinks]]`. |
 | "log this / remember this / kill this idea" | Append only to `Log/YYYY-MM-DD.md` (or `scripts/log.sh`). |

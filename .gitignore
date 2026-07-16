@@ -27,3 +27,4 @@ _indexes/*
 # Local scratch / marketing decks that must not ship in the template
 Drafts/**/*
 !Drafts/.gitkeep
+scripts/podcasts/shows.json

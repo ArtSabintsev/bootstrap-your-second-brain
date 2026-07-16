@@ -1,0 +1,16 @@
+{
+  "your-show-key": {
+    "title": "Your Show Title",
+    "url": "https://www.youtube.com/@SomeChannel/videos",
+    "tags": ["ai-agents"],
+    "notes": "Deep-synthesis show: every episode gets its own note under Library/podcasts/your-show-key/. Key is kebab-case; url is the channel's /videos page or a playlist. Tags come from the approved list in AGENTS.md."
+  },
+  "daily-news-example": {
+    "title": "A Daily News Podcast",
+    "url": "https://example.com/feed.rss",
+    "source": "rss",
+    "role": "world-context",
+    "tags": ["history"],
+    "notes": "World-context show: monthly digests only (consolidate_world_context.py), never one note per episode. source=rss reads the feed; omit source for YouTube shows."
+  }
+}

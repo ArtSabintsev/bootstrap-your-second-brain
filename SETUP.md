@@ -23,7 +23,10 @@ You are standing up a personal vault, not answering a one-shot query.
 2. Write `config.json` from answers (copy from `config.example.json` first via bootstrap).
 3. Create/edit seed notes under `Profile/` (overview, identity, working-with-me).
 4. Write secret files **only** under the configured `secrets_dir` (never in the vault).
-5. Edit `scripts/podcasts/shows.json` to match shows they follow.
+5. Interview the operator for the podcasts they follow, find each show's
+   YouTube channel (`/videos` URL or playlist) or RSS feed yourself (WebSearch),
+   and write `scripts/podcasts/shows.json` (schema: `shows.example.json`;
+   starts empty, nothing is pre-populated).
 6. Run `scripts/bootstrap.sh`, `scripts/doctor.sh`, auth commands (`xtap`, `gh`).
 7. Install the launchd plist after bootstrap rewrote the vault path.
 8. Recommend Obsidian + Web Clipper from TOOLS.md. Bootstrap installs Omnisearch (Cmd/Ctrl+K), Ghostty Terminal, and Claudian into `.obsidian/plugins/`.
@@ -124,8 +127,14 @@ gh auth status   # or: gh auth login
 
 ## Step 5. Podcasts, Profile, recommended apps
 
+`shows.json` starts **empty**. List the shows you actually follow, one entry
+per show, using `scripts/podcasts/shows.example.json` as the schema (YouTube
+channel `/videos` URL or playlist for deep-synthesis shows; `source: rss` +
+`role: world-context` for a daily-news digest show). An agent doing setup
+should interview you for the shows and find the URLs itself.
+
 ```bash
-$EDITOR scripts/podcasts/shows.json   # keep only shows you follow
+$EDITOR scripts/podcasts/shows.json   # or let your agent fill it
 ```
 
 Fill `Profile/00-overview.md` and `Profile/working-with-me.md` (agents load

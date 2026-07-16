@@ -153,9 +153,13 @@ fi
 if brain_source_enabled podcasts; then
   if [[ -f scripts/podcasts/shows.json ]]; then
     COUNT="$(brain_py -c "import json;print(len(json.load(open('scripts/podcasts/shows.json'))))" 2>/dev/null || echo 0)"
-    ok "shows.json has $COUNT show(s)"
+    if [[ "$COUNT" -gt 0 ]]; then
+      ok "shows.json has $COUNT show(s)"
+    else
+      fail "shows.json is empty but sources.podcasts is on: interview the operator for shows, find each channel/feed URL, fill scripts/podcasts/shows.json (schema: shows.example.json)"
+    fi
   else
-    fail "scripts/podcasts/shows.json missing"
+    fail "scripts/podcasts/shows.json missing (run bootstrap, then fill it; schema: shows.example.json)"
   fi
 fi
 

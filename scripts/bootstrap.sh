@@ -44,6 +44,13 @@ NAME="$(brain_py scripts/config.py identity.name 2>/dev/null || echo 'Your Name'
 CONTEXT="$(brain_py scripts/config.py identity.context 2>/dev/null || echo '')"
 TODAY="$(date +%Y-%m-%d)"
 
+# 4b. podcast shows: operator-populated (interview + find URLs; see SETUP.md).
+# Ship none; create an empty registry so scripts have a file to read.
+if [[ ! -f scripts/podcasts/shows.json ]]; then
+  printf '{}\n' > scripts/podcasts/shows.json
+  echo "created empty scripts/podcasts/shows.json (fill via SETUP.md step 5; schema: scripts/podcasts/shows.example.json)"
+fi
+
 # 5. Profile seeds. Write when the file is missing OR still the shipped
 # placeholder stub ("Replace this stub"); never overwrite operator edits.
 seed_profile() {
@@ -281,7 +288,7 @@ Bootstrap complete (incl. Obsidian plugins if network ok). Next steps (SETUP.md)
   2. Secrets -> $SECRETS   (e.g. goodreads/rss-key). Never in the vault.
   3. Fill Profile/         (00-overview.md, working-with-me.md)
   4. Auth X:  .venv/bin/xtap auth browser --browser $BROWSER && .venv/bin/xtap auth whoami
-  5. Podcasts: edit scripts/podcasts/shows.json for your shows
+  5. Podcasts: have your agent interview you for shows you follow, find each\n     channel/feed URL, and fill scripts/podcasts/shows.json (schema: shows.example.json)
   6. Doctor:  bash scripts/doctor.sh
   7. Ensure claude (and optionally grok) CLIs are installed
   8. Daily job: cp scripts/com.brain.ingest.plist ~/Library/LaunchAgents/ && \\
