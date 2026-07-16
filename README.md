@@ -76,6 +76,12 @@ launchctl load ~/Library/LaunchAgents/com.brain.ingest.plist
 Agent path: *"Follow SETUP.md and bootstrap my second brain. Interview me for
 config. Do not invent secrets. Do not push unless I say so."*
 
+## The deck
+
+A presentation of the whole system, built from a live vault:
+[docs/deck/bootstrapping-your-second-brain.html](docs/deck/bootstrapping-your-second-brain.html)
+(markdown source alongside it).
+
 ## Day-to-day
 
 ```bash
